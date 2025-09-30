@@ -1,661 +1,471 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FESTRONIX - Pioneering Space Technology</title>
-    <meta name="description" content="FESTRONIX is pioneering the future of space technology with quantum propulsion, AI navigation, and advanced life support systems for human space exploration.">
-    <meta name="keywords" content="space technology, quantum propulsion, space exploration, satellites, Mars mission, AI navigation">
-    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Festronix — Cosmic Motion</title>
     <style>
+        /* Reset */
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
+            margin: 0;
+            padding: 0
         }
 
+        html,
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: hsl(240, 20%, 4%);
-            color: hsl(210, 40%, 98%);
-            overflow-x: hidden;
-            line-height: 1.6;
+            height: 100%;
+            background: #020217;
+            overflow: hidden;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial
         }
 
-        /* Space Background Animations */
-        .space-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Layout */
+        .stage {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(1200px 600px at 10% 20%, rgba(62, 16, 90, 0.18), transparent 10%),
+                radial-gradient(900px 400px at 85% 80%, rgba(12, 34, 90, 0.12), transparent 8%),
+                linear-gradient(180deg, #04031a 0%, #050417 40%, #08102a 100%);
+            isolation: isolate;
+            cursor: default;
+        }
+
+        /* Canvas sits underneath the UI */
+        canvas#starsCanvas {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, hsl(260, 60%, 8%), hsl(220, 70%, 12%));
-            animation: cosmic-flow 20s ease-in-out infinite;
-            z-index: -2;
+            display: block;
+            z-index: 0;
         }
 
-        @keyframes cosmic-flow {
-            0% { background: linear-gradient(135deg, hsl(260, 60%, 8%), hsl(220, 70%, 12%)); }
-            25% { background: linear-gradient(45deg, hsl(220, 70%, 12%), hsl(320, 50%, 18%)); }
-            50% { background: linear-gradient(225deg, hsl(320, 50%, 18%), hsl(45, 80%, 25%)); }
-            75% { background: linear-gradient(315deg, hsl(45, 80%, 25%), hsl(260, 60%, 8%)); }
-            100% { background: linear-gradient(135deg, hsl(260, 60%, 8%), hsl(220, 70%, 12%)); }
-        }
-
-        /* Stars */
-        .star {
-            position: fixed;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: twinkle 4s ease-in-out infinite;
-            z-index: -1;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.5); }
-        }
-
-        /* Planet */
-        .planet-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: -1;
-        }
-
-        .planet {
-            width: 384px;
-            height: 384px;
-            border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            animation: planet-pulse 8s ease-in-out infinite;
-        }
-
-        .planet-surface {
+        /* Soft nebula glows layered with blend modes */
+        .nebula {
             position: absolute;
             inset: 0;
-            border-radius: 50%;
-            background: 
-                radial-gradient(ellipse 80px 60px at 25% 30%, hsl(25, 45%, 35%) 0%, transparent 70%),
-                radial-gradient(ellipse 100px 80px at 70% 20%, hsl(25, 45%, 35%) 0%, transparent 60%),
-                radial-gradient(ellipse 90px 70px at 60% 70%, hsl(25, 45%, 35%) 0%, transparent 65%),
-                radial-gradient(ellipse 70px 50px at 20% 80%, hsl(25, 45%, 35%) 0%, transparent 70%),
-                radial-gradient(circle at center, hsl(220, 60%, 25%), hsl(240, 30%, 15%));
+            z-index: 1;
+            pointer-events: none;
         }
 
-        .planet-clouds {
+        .nebula .cloud {
             position: absolute;
-            inset: 0;
-            border-radius: 50%;
+            width: 120vmax;
+            height: 60vmax;
+            filter: blur(60px) saturate(140%);
+            mix-blend-mode: screen;
+            opacity: 0.55;
+            animation: floatCloud 30s linear infinite;
+            will-change: transform;
+        }
+
+        .cloud.c1 {
+            background: radial-gradient(closest-side, rgba(20, 185, 255, 0.12), rgba(10, 10, 40, 0));
+            transform: translate(-55%, -46%) rotate(8deg) scaleX(1.2);
+            animation-duration: 32s;
+        }
+
+        .cloud.c2 {
+            background: radial-gradient(closest-side, rgba(160, 50, 200, 0.12), rgba(10, 10, 40, 0));
+            transform: translate(-50%, -52%) rotate(-6deg) scaleX(1.0);
+            animation-duration: 38s;
             opacity: 0.6;
-            background: 
-                radial-gradient(ellipse 120px 40px at 40% 25%, hsl(0, 0%, 85%, 0.8) 0%, transparent 70%),
-                radial-gradient(ellipse 80px 30px at 80% 45%, hsl(0, 0%, 85%, 0.6) 0%, transparent 60%),
-                radial-gradient(ellipse 100px 35px at 30% 75%, hsl(0, 0%, 85%, 0.7) 0%, transparent 65%);
-            animation: float 15s ease-in-out infinite;
         }
 
-        .planet-atmosphere {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            background: radial-gradient(circle at center, transparent 60%, hsl(200, 40%, 60%, 0.4) 85%, hsl(200, 40%, 60%, 0.8) 100%);
-            box-shadow: 
-                0 0 120px hsl(200, 40%, 60%, 0.3),
-                inset -20px -20px 50px hsl(240, 30%, 15%, 0.6);
+        .cloud.c3 {
+            background: radial-gradient(closest-side, rgba(255, 60, 140, 0.08), rgba(10, 10, 40, 0));
+            transform: translate(-45%, -50%) rotate(22deg) scaleX(1.25);
+            animation-duration: 45s;
+            opacity: 0.45;
         }
 
-        .planet-ring {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 1px solid hsl(180, 100%, 70%, 0.2);
-            border-radius: 50%;
-            animation: float 12s ease-in-out infinite;
-            opacity: 0.4;
-        }
-
-        .planet-ring:nth-child(4) {
-            width: 500px;
-            height: 100px;
-        }
-
-        .planet-ring:nth-child(5) {
-            width: 600px;
-            height: 120px;
-            animation-delay: 2s;
-            animation-duration: 15s;
-            opacity: 0.3;
-        }
-
-        @keyframes planet-pulse {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.05) rotate(180deg); }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-20px) rotate(120deg); }
-            66% { transform: translateY(-10px) rotate(240deg); }
-        }
-
-        /* Tech Elements */
-        .tech-element {
-            position: fixed;
-            animation: float 6s ease-in-out infinite;
-            filter: drop-shadow(0 0 20px hsl(180, 100%, 70%, 0.6));
-            z-index: -1;
-        }
-
-        .tech-element svg {
-            color: hsl(180, 100%, 70%);
-        }
-
-        /* Main Content */
-        .main-content {
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .festronix-logo {
-            font-size: clamp(4rem, 12vw, 9rem);
-            font-weight: 900;
-            margin-bottom: 2rem;
-            letter-spacing: 0.2em;
-            background: linear-gradient(45deg, hsl(260, 100%, 65%), hsl(280, 100%, 70%));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            filter: drop-shadow(0 0 40px hsl(260, 100%, 65%, 0.5));
-            animation: logo-glow 3s ease-in-out infinite alternate;
-            opacity: 0;
-            transform: translateY(20px);
-            animation-fill-mode: both;
-        }
-
-        @keyframes logo-glow {
-            0% { filter: drop-shadow(0 0 20px hsl(260, 100%, 65%, 0.5)); }
-            100% { filter: drop-shadow(0 0 40px hsl(260, 100%, 65%, 0.8)); }
-        }
-
-        .hero-subtitle {
-            font-size: clamp(1.2rem, 4vw, 2rem);
-            color: hsl(210, 40%, 80%);
-            margin-bottom: 3rem;
-            max-width: 800px;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: slide-up 0.8s ease-out 1s both;
-        }
-
-        .hero-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            justify-content: center;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: slide-up 0.8s ease-out 1.5s both;
-        }
-
-        .space-button {
-            padding: 1rem 2rem;
-            border: 2px solid;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 1.1rem;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            border-color: hsl(260, 100%, 65%, 0.5);
-            color: hsl(260, 100%, 65%);
-            box-shadow: 0 0 30px hsl(260, 100%, 65%, 0.3);
-        }
-
-        .btn-primary:hover {
-            background: hsl(260, 100%, 65%, 0.3);
-            border-color: hsl(260, 100%, 65%);
-            box-shadow: 0 0 40px hsl(260, 100%, 65%, 0.5);
-            transform: scale(1.05);
-        }
-
-        .btn-secondary {
-            border-color: hsl(240, 15%, 25%);
-            color: hsl(210, 40%, 98%);
-            box-shadow: 0 0 20px hsl(240, 15%, 25%, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: hsl(240, 15%, 25%, 0.3);
-            box-shadow: 0 0 30px hsl(240, 15%, 25%, 0.5);
-            transform: scale(1.05);
-        }
-
-        .btn-accent {
-            border-color: hsl(280, 100%, 70%, 0.5);
-            color: hsl(280, 100%, 70%);
-            box-shadow: 0 0 30px hsl(280, 100%, 70%, 0.3);
-        }
-
-        .btn-accent:hover {
-            background: hsl(280, 100%, 70%, 0.3);
-            border-color: hsl(280, 100%, 70%);
-            box-shadow: 0 0 40px hsl(280, 100%, 70%, 0.5);
-            transform: scale(1.05);
-        }
-
-        .scroll-indicator {
-            position: relative;
-            bottom: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0;
-            animation: slide-up 0.8s ease-out 2s both;
-        }
-
-        .scroll-text {
-            font-size: 0.875rem;
-            color: hsl(210, 40%, 60%);
-            margin-bottom: 1rem;
-        }
-
-        .scroll-arrow {
-            width: 1.5rem;
-            height: 2.5rem;
-            border: 2px solid hsl(260, 100%, 65%, 0.5);
-            border-radius: 1rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .scroll-dot {
-            width: 0.25rem;
-            height: 0.75rem;
-            background: hsl(260, 100%, 65%);
-            border-radius: 0.25rem;
-            margin-top: 0.5rem;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-7px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        /* Content Section */
-        .content-section {
-            min-height: 100vh;
-            padding: 5rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .section-description {
-            font-size: 1.25rem;
-            color: hsl(210, 40%, 70%);
-            text-align: center;
-            max-width: 800px;
-            margin: 0 auto 5rem;
-            line-height: 1.8;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 5rem;
-        }
-
-        .feature-card {
-            background: hsl(240, 15%, 6%, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid hsl(240, 15%, 15%, 0.3);
-            border-radius: 1rem;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 32px hsl(260, 100%, 65%, 0.1);
-        }
-
-        .feature-card:hover {
-            background: hsl(240, 15%, 6%, 0.2);
-            transform: scale(1.05);
-            box-shadow: 0 12px 40px hsl(260, 100%, 65%, 0.2);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .feature-description {
-            color: hsl(210, 40%, 70%);
-            line-height: 1.6;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
-
-        .stat-card {
-            background: hsl(240, 15%, 6%, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid hsl(240, 15%, 15%, 0.3);
-            border-radius: 0.5rem;
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            background: hsl(240, 15%, 6%, 0.2);
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: bold;
-            color: hsl(260, 100%, 65%);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: hsl(210, 40%, 70%);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        @keyframes slide-up {
-            0% { transform: translateY(100px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
+        @keyframes floatCloud {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg)
             }
-            
-            .space-button {
-                width: 100%;
-                max-width: 300px;
+
+            50% {
+                transform: translate(-48%, -52%) rotate(3deg)
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg)
+            }
+        }
+
+        /* small UI hint bottom-left */
+        .hint {
+            position: fixed;
+            left: 14px;
+            bottom: 12px;
+            z-index: 4;
+            font-size: 12px;
+            color: rgba(200, 220, 255, 0.6);
+            background: rgba(5, 8, 18, 0.5);
+            padding: 8px 10px;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            pointer-events: auto;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width:560px) {
+            .hint {
+                font-size: 11px;
+                padding: 6px 8px
+            }
+
+            .logoText {
+                letter-spacing: 3px
             }
         }
     </style>
 </head>
+
 <body>
-    <!-- Space Background -->
-    <div class="space-bg"></div>
+    <div class="stage" id="stage">
+        <!-- Canvas for stars and shooting stars -->
+        <canvas id="starsCanvas"></canvas>
 
-    <!-- Stars will be generated by JavaScript -->
-
-    <!-- Planet -->
-    <div class="planet-container">
-        <div class="planet">
-            <div class="planet-surface"></div>
-            <div class="planet-clouds"></div>
-            <div class="planet-atmosphere"></div>
+        <!-- Nebula glows -->
+        <div class="nebula" aria-hidden="true">
+            <div class="cloud c1"></div>
+            <div class="cloud c2"></div>
+            <div class="cloud c3"></div>
         </div>
-        <div class="planet-ring"></div>
-        <div class="planet-ring"></div>
-    </div>
 
-    <!-- Tech Elements will be generated by JavaScript -->
+        <!-- Center content -->
+        <div class="center" aria-hidden="false">
+            <div class="hint" id="hint">Move your mouse — subtle parallax • Click to spawn a shooting star</div>
+        </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Hero Section -->
-        <section class="hero">
-            <h1 class="festronix-logo" id="logo">FESTRONIX</h1>
-            <p class="hero-subtitle">Pioneering the Future of Space Technology</p>
-            
-            <div class="hero-buttons">
-                <a href="#missions" class="space-button btn-primary">Explore Missions</a>
-                <a href="#technology" class="space-button btn-secondary">Our Technology</a>
-                <a href="#future" class="space-button btn-accent">Join the Future</a>
-            </div>
+        <script>
+            /* ---------------------------
+               Starfield + Shooting Stars
+               ---------------------------
+               Canvas draws:
+               - many small star particles (twinkling)
+               - occasional shooting stars (lines that fade)
+               - mouse parallax applied by offsetting star coordinates slightly
+            */
 
-            <div class="scroll-indicator">
-                <span class="scroll-text">Scroll to explore</span>
-                <div class="scroll-arrow">
-                    <div class="scroll-dot"></div>
-                </div>
-            </div>
-        </section>
+            (() => {
+                const canvas = document.getElementById('starsCanvas');
+                const ctx = canvas.getContext('2d', { alpha: true });
+                let w = 0, h = 0, cx = 0, cy = 0;
+                let DPR = Math.max(1, window.devicePixelRatio || 1);
 
-        <!-- Content Section -->
-        <section class="content-section" id="missions">
-            <h2 class="section-title">Advancing Human Space Exploration</h2>
-            <p class="section-description">
-                At FESTRONIX, we're not just building spacecraft – we're crafting the future of humanity among the stars. 
-                Our cutting-edge technology and innovative solutions are designed to push the boundaries of what's possible 
-                in space exploration.
-            </p>
+                // Configuration
+                const STAR_COUNT = 600;        // base star count (scaled with size)
+                const STAR_MIN_R = 0.35;
+                const STAR_MAX_R = 1.6;
+                const TWINKLE_SPEED = 0.02;   // how fast twinkle phase moves
+                const SHOOT_PROB = 0.006;     // chance each frame to spawn a shooting star
+                const SHOOT_MIN_SPEED = 8;
+                const SHOOT_MAX_SPEED = 14;
+                const nebulaContainer = document.querySelector('.nebula');
+                const PARALLAX_STAR_X = 18;  // Max horizontal star shift (multiplied by DPR)
+                const PARALLAX_STAR_Y = 12;  // Max vertical star shift (multiplied by DPR)
+                const PARALLAX_NEBULA_X = -4; // Max horizontal nebula shift
+                const PARALLAX_NEBULA_Y = -3; // Max vertical nebula shift
 
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3 class="feature-title">Quantum Propulsion</h3>
-                    <p class="feature-description">Revolutionary propulsion systems that redefine speed and efficiency in space travel.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🧠</div>
-                    <h3 class="feature-title">AI Navigation</h3>
-                    <p class="feature-description">Advanced artificial intelligence for autonomous navigation through the cosmos.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">🌱</div>
-                    <h3 class="feature-title">Life Support Systems</h3>
-                    <p class="feature-description">Next-generation life support technology for long-duration space missions.</p>
-                </div>
-            </div>
+                const stage = document.getElementById('stage');
+                let mouse = { x: 0, y: 0, px: 0, py: 0 }; // mouse pos (0..1)
+                let smoothMouse = { x: 0.5, y: 0.5 };
+                const SMOOTH_FACTOR = 0.08; // How fast the smoothed value catches up
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">47</div>
-                    <div class="stat-label">Successful Missions</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-number">12</div>
-                    <div class="stat-label">Active Satellites</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-number">8.7M</div>
-                    <div class="stat-label">Miles Traveled</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-number">2031</div>
-                    <div class="stat-label">Mars Landing Target</div>
-                </div>
-            </div>
-        </section>
-    </div>
+                // Star object
+                class Star {
+                    constructor(x, y, r, alpha, tPhase) {
+                        this.x = x;
+                        this.y = y;
+                        this.r = r;
+                        this.baseAlpha = alpha;
+                        this.t = tPhase;
+                        this.twinkleSpeed = (Math.random() * 0.8 + 0.4) * TWINKLE_SPEED;
+                        this.dx = (Math.random() - 0.5) * 0.02;
+                        this.z = 0.3 + Math.random() * 0.7;
+                        this.hue = Math.random() < 0.7 ? 210 + Math.random() * 40 : 0;
+                    }
+                }
 
-    <script>
-        // Generate stars
-        function generateStars() {
-            const starContainer = document.body;
-            const starCount = 150;
+                // Shooting star object - REPLACED WITH CLASS
+                class ShootingStar {
+                    constructor(x, y, vx, vy, life, length) {
+                        this.x = x;
+                        this.y = y;
+                        this.vx = vx;
+                        this.vy = vy;
+                        this.life = life;
+                        this.maxLife = life;
+                        this.length = length;
+                    }
+                }
 
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.width = (Math.random() * 3 + 1) + 'px';
-                star.style.height = star.style.width;
-                star.style.animationDelay = Math.random() * 4 + 's';
-                starContainer.appendChild(star);
-            }
-        }
+                let stars = [], shoots = [];
 
-        // Generate tech elements
-        function generateTechElements() {
-            const techElements = [
-                { type: 'satellite', x: 10, y: 20, size: 40 },
-                { type: 'station', x: 85, y: 15, size: 60 },
-                { type: 'rocket', x: 15, y: 75, size: 35 },
-                { type: 'probe', x: 80, y: 80, size: 25 },
-                { type: 'satellite', x: 5, y: 50, size: 30 },
-                { type: 'station', x: 90, y: 45, size: 45 }
-            ];
+                function resize() {
+                    DPR = Math.max(1, window.devicePixelRatio || 1);
+                    w = canvas.width = Math.round(stage.clientWidth * DPR);
+                    h = canvas.height = Math.round(stage.clientHeight * DPR);
+                    canvas.style.width = stage.clientWidth + 'px';
+                    canvas.style.height = stage.clientHeight + 'px';
+                    cx = w / 2; cy = h / 2;
+                    // regenerate stars based on new size
+                    initStars();
+                }
 
-            techElements.forEach((element, index) => {
-                const techDiv = document.createElement('div');
-                techDiv.className = 'tech-element';
-                techDiv.style.left = element.x + '%';
-                techDiv.style.top = element.y + '%';
-                techDiv.style.animationDelay = (index * 0.8) + 's';
-                techDiv.style.animationDuration = (6 + index * 0.5) + 's';
-                
-                const icon = createTechIcon(element.type, element.size);
-                techDiv.appendChild(icon);
-                document.body.appendChild(techDiv);
-            });
-        }
+                function generateStarSprites(minR, maxR, count) {
+                    const sprites = {};
+                    for (let r = minR; r <= maxR; r += 0.5) {
+                        const key = r.toFixed(1);
+                        const size = r * 2 * DPR + 4; // Add padding
+                        const spriteCanvas = document.createElement('canvas');
+                        spriteCanvas.width = spriteCanvas.height = size;
+                        const sctx = spriteCanvas.getContext('2d');
+                        const centerX = size / 2;
 
-        // Create tech icons
-        function createTechIcon(type, size) {
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.setAttribute('viewBox', '0 0 100 100');
-            svg.style.width = size + 'px';
-            svg.style.height = size + 'px';
-            svg.style.filter = 'drop-shadow(0 0 20px hsl(180, 100%, 70%, 0.6))';
-            svg.style.color = 'hsl(180, 100%, 70%)';
+                        // Draw the core star
+                        sctx.beginPath();
+                        sctx.fillStyle = 'rgba(255, 255, 255, 1)'; // Draw max brightness
+                        sctx.arc(centerX, centerX, r * DPR, 0, Math.PI * 2);
+                        sctx.fill();
 
-            let content = '';
-            switch (type) {
-                case 'satellite':
-                    content = `
-                        <rect x="30" y="40" width="40" height="20" fill="currentColor" />
-                        <rect x="10" y="45" width="15" height="10" fill="currentColor" />
-                        <rect x="75" y="45" width="15" height="10" fill="currentColor" />
-                        <circle cx="50" cy="50" r="3" fill="hsl(45, 100%, 60%)" />
-                    `;
-                    break;
-                case 'station':
-                    content = `
-                        <circle cx="50" cy="50" r="15" fill="currentColor" />
-                        <rect x="20" y="48" width="60" height="4" fill="currentColor" />
-                        <rect x="48" y="20" width="4" height="60" fill="currentColor" />
-                        <circle cx="50" cy="50" r="5" fill="hsl(45, 100%, 60%)" />
-                    `;
-                    break;
-                case 'rocket':
-                    content = `
-                        <polygon points="50,10 40,70 60,70" fill="currentColor" />
-                        <polygon points="40,70 35,85 45,75" fill="currentColor" />
-                        <polygon points="60,70 65,85 55,75" fill="currentColor" />
-                        <circle cx="50" cy="40" r="5" fill="hsl(45, 100%, 60%)" />
-                    `;
-                    break;
-                case 'probe':
-                    content = `
-                        <circle cx="50" cy="50" r="12" fill="currentColor" />
-                        <line x1="30" y1="30" x2="45" y2="45" stroke="currentColor" stroke-width="2" />
-                        <line x1="70" y1="30" x2="55" y2="45" stroke="currentColor" stroke-width="2" />
-                        <line x1="30" y1="70" x2="45" y2="55" stroke="currentColor" stroke-width="2" />
-                        <line x1="70" y1="70" x2="55" y2="55" stroke="currentColor" stroke-width="2" />
-                    `;
-                    break;
-            }
-            svg.innerHTML = content;
-            return svg;
-        }
+                        // Store the canvas image
+                        sprites[key] = spriteCanvas;
+                    }
+                    return sprites;
+                }
 
-        // Logo animation
-        function animateLogo() {
-            const logo = document.getElementById('logo');
-            setTimeout(() => {
-                logo.style.animation = 'slide-up 0.8s ease-out both, logo-glow 3s ease-in-out infinite alternate';
-            }, 1000);
-        }
+                let starSprites = {}; // Global variable, near 'stars = []'
 
-        // Smooth scrolling for navigation
-        document.addEventListener('DOMContentLoaded', function() {
-            const links = document.querySelectorAll('a[href^="#"]');
-            links.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({ behavior: 'smooth' });
+                function initStars() {
+                    stars = [];
+                    const area = (w * h) / (1000 * 1000);
+                    const count = Math.round(STAR_COUNT * area * 1.4);
+                    starSprites = generateStarSprites(STAR_MIN_R, STAR_MAX_R, 6);
+                    for (let i = 0; i < count; i++) {
+                        const x = Math.random() * w;
+                        const y = Math.random() * h;
+                        const r = STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R);
+                        const baseAlpha = 0.45 + Math.random() * 0.6;
+                        const tPhase = Math.random() * Math.PI * 2;
+                        const rQuantized = Math.round((STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R)) * 2) / 2;
+                        stars.push(new Star(x, y, rQuantized, baseAlpha, tPhase));
+                    }
+                }
+
+                // spawn shooting star from random edge
+                function spawnShootingStar(manualPos) {
+                    // pick random angle across screen; prefer top-left -> bottom-right diagonals
+                    const startFrom = Math.random();
+                    let x, y, tx, ty, speed;
+                    if (manualPos) { // spawned via click - start near mouse, go diagonally
+                        const x = manualPos.x * w;
+                        const y = manualPos.y * h;
+
+                        // IMPROVED ANGLE: Calculate angle from the click point TOWARDS the center (cx, cy)
+                        const angleToCenter = Math.atan2(cy - y, cx - x);
+
+                        // Set the star angle to be mostly away from the center, with a slight random variance.
+                        // Add Math.PI to 'angleToCenter' to point AWAY from the center.
+                        const ang = angleToCenter + Math.PI + (Math.random() - 0.5) * 0.4;
+
+                        const speed = SHOOT_MIN_SPEED + Math.random() * (SHOOT_MAX_SPEED - SHOOT_MIN_SPEED);
+                        const vx = Math.cos(ang) * speed;
+                        const vy = Math.sin(ang) * speed;
+                        shoots.push(new ShootingStar(x, y, vx, vy, Math.round(40 + Math.random() * 34), 120 + Math.random() * 120));
+                        return;
+                    }
+
+                    if (startFrom < 0.5) {
+                        // from left/top edges
+                        if (Math.random() < 0.6) { x = Math.random() * w * 0.2; y = -10 - Math.random() * h * 0.1; }
+                        else { x = -10 - Math.random() * w * 0.1; y = Math.random() * h * 0.2; }
+                    } else {
+                        // from right/top
+                        if (Math.random() < 0.6) { x = w + 10 + Math.random() * w * 0.2; y = -10 - Math.random() * h * 0.1; }
+                        else { x = w + 10 + Math.random() * w * 0.1; y = Math.random() * h * 0.2; }
+                    }
+                    // aim roughly across center with some variance
+                    const angleToCenter = Math.atan2(cy - y, cx - x) + (Math.random() - 0.5) * 0.6;
+                    speed = SHOOT_MIN_SPEED + Math.random() * (SHOOT_MAX_SPEED - SHOOT_MIN_SPEED);
+                    const vx = Math.cos(angleToCenter) * speed;
+                    const vy = Math.sin(angleToCenter) * speed;
+                    shoots.push(new ShootingStar(x, y, vx, vy, Math.round(30 + Math.random() * 45), 90 + Math.random() * 140));
+                }
+
+                // Render
+                let lastTs = 0;
+                function animate(ts) {
+                    const dt = Math.min(60, ts - lastTs);
+                    lastTs = ts;
+                    ctx.clearRect(0, 0, w, h);
+
+                    // compute smoothed mouse pos (Linear Interpolation)
+                    const dtFactor = dt / 16; // Use delta time to make smoothing frame-rate independent
+
+                    smoothMouse.x += (mouse.x - smoothMouse.x) * SMOOTH_FACTOR * dtFactor;
+                    smoothMouse.y += (mouse.y - smoothMouse.y) * SMOOTH_FACTOR * dtFactor;
+
+                    // compute parallax offset (small)
+                    const parx = (smoothMouse.x - 0.5) * PARALLAX_STAR_X * DPR;
+                    const pary = (smoothMouse.y - 0.5) * PARALLAX_STAR_Y * DPR;
+
+                    const nebulaParallaxX = (smoothMouse.x - 0.5) * PARALLAX_NEBULA_X;
+                    const nebulaParallaxY = (smoothMouse.y - 0.5) * PARALLAX_NEBULA_Y;
+                    // Set the CSS transform property
+                    nebulaContainer.style.transform = `translate(${nebulaParallaxX}px, ${nebulaParallaxY}px)`;
+
+                    // draw stars
+                    for (let i = 0; i < stars.length; i++) {
+                        const s = stars[i];
+                        // twinkle phase update
+                        s.t += s.twinkleSpeed * (dt / 16);
+                        const tw = (Math.sin(s.t) + 1) / 2; // 0..1
+                        const alpha = Math.max(0.05, Math.min(1, s.baseAlpha * (0.6 + 0.6 * tw)));
+                        const parallaxFactor = 1.0 - s.z;
+                        const depthFactor = 1.0 - s.z;
+                        const x = Math.round(s.x + parx * parallaxFactor * 0.5);
+                        const y = Math.round(s.y + pary * parallaxFactor * 0.5);
+                        // draw glow for bigger stars
+                        if (s.r > 1.2) {
+                            const g = ctx.createRadialGradient(x, y, 0, x, y, s.r * 9 * DPR);
+                            g.addColorStop(0, `rgba(180,220,255,${(alpha * 0.22).toFixed(3)})`);
+                            g.addColorStop(0.4, `rgba(120,200,255,${(alpha * 0.09).toFixed(3)})`);
+                            g.addColorStop(1, 'rgba(0,0,0,0)');
+                            ctx.fillStyle = g;
+                            ctx.beginPath();
+                            ctx.arc(x, y, s.r * 9 * DPR, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        // core
+                        ctx.beginPath();
+                        let starColor;
+                        if (s.hue === 0) {
+                            // Pure White
+                            starColor = `rgba(255,255,255,${alpha.toFixed(3)})`;
+                        } else {
+                            // Tinted color using HSL (Saturation and Lightness fixed, Alpha uses twinkle)
+                            const lightness = 80 + s.r * 10; // Slightly brighter larger stars
+                            starColor = `hsla(${s.hue}, 100%. ${lightness}%, ${alpha.toFixed(3)})`;
+                        }
+                        ctx.fillStyle = starColor;
+                        ctx.arc(x, y, s.r * DPR, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // tiny drift
+                        s.x += s.dx * (dt / 16);
+                        if (s.x < -20) s.x = w + 20;
+                        if (s.x > w + 20) s.x = -20;
+                        if (s.y < -20) s.y = h + 20;
+                        if (s.y > h + 20) s.y = -20;
+                    }
+
+                    // update and draw shooting stars (lines + glow)
+                    for (let i = shoots.length - 1; i >= 0; i--) {
+                        const sh = shoots[i];
+                        // fade factor
+                        const f = sh.life / sh.maxLife;
+                        // tail end point
+                        const tx = sh.x - sh.vx * (sh.length / 80);
+                        const ty = sh.y - sh.vy * (sh.length / 80);
+
+                        // gradient for tail
+                        const g = ctx.createLinearGradient(sh.x, sh.y, tx, ty);
+                        g.addColorStop(0, `rgba(255,255,255,${(0.95 * f).toFixed(3)})`);
+                        g.addColorStop(0.6, `rgba(180,220,255,${(0.35 * f).toFixed(3)})`);
+                        g.addColorStop(1, `rgba(100,150,255,${(0.02 * f).toFixed(3)})`);
+
+                        ctx.strokeStyle = g;
+                        ctx.lineWidth = 1.8 * DPR;
+                        ctx.beginPath();
+                        ctx.moveTo(sh.x, sh.y);
+                        ctx.lineTo(tx, ty);
+                        ctx.stroke();
+
+                        // bright head
+                        ctx.beginPath();
+                        ctx.fillStyle = `rgba(255,255,255,${(0.98 * f).toFixed(3)})`;
+                        ctx.arc(sh.x, sh.y, 2.6 * DPR * Math.min(1.3, f * 1.6), 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // update
+                        sh.x += sh.vx * (dt / 16);
+                        sh.y += sh.vy * (dt / 16);
+                        sh.life -= (dt / 16);
+                        // remove if life ended or far outside screen
+                        if (sh.life <= 0 || sh.x < -200 || sh.x > w + 200 || sh.y < -200 || sh.y > h + 200) {
+                            shoots.splice(i, 1);
+                        }
+                    }
+
+                    // sometimes spawn new shooting star
+                    if (Math.random() < SHOOT_PROB) spawnShootingStar();
+
+                    requestAnimationFrame(animate);
+                }
+
+                // Mouse handling for parallax and click to spawn star
+                function onMouseMove(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    mouse.x = ((e.clientX - rect.left) / rect.width) || 0.5;
+                    mouse.y = ((e.clientY - rect.top) / rect.height) || 0.5;
+                }
+                function onTouchMove(e) {
+                    if (!e.touches || e.touches.length === 0) return;
+                    const t = e.touches[0];
+                    onMouseMove({ clientX: t.clientX, clientY: t.clientY });
+                }
+                canvas.addEventListener('mousemove', onMouseMove);
+                canvas.addEventListener('touchmove', onTouchMove, { passive: true });
+
+                // click to spawn shooting star at pointer
+                canvas.addEventListener('click', (ev) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const px = (ev.clientX - rect.left) / rect.width;
+                    const py = (ev.clientY - rect.top) / rect.height;
+                    spawnShootingStar({ x: px, y: py });
+                    // small visual feedback: create a short bright burst by adding 2-3 tiny shoots
+                    for (let i = 0; i < 2; i++) {
+                        spawnShootingStar({ x: px, y: py });
                     }
                 });
-            });
-        });
 
-        // Initialize
-        generateStars();
-        generateTechElements();
-        animateLogo();
+                // keyboard toggles: press 's' to spawn a burst
+                window.addEventListener('keydown', (e) => {
+                    if (e.key.toLowerCase() === 's') {
+                        spawnShootingStar();
+                        spawnShootingStar();
+                    }
+                });
 
-        // Intersection Observer for animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'slide-up 0.8s ease-out both';
+                // init
+                function start() {
+                    resize();
+                    lastTs = performance.now();
+                    requestAnimationFrame(animate);
                 }
-            });
-        }, observerOptions);
 
-        // Observe elements for animations
-        document.addEventListener('DOMContentLoaded', () => {
-            const animatedElements = document.querySelectorAll('.feature-card, .stat-card');
-            animatedElements.forEach((el, index) => {
-                el.style.animationDelay = (index * 0.2) + 's';
-                observer.observe(el);
-            });
-        });
-    </script>
+                window.addEventListener('resize', () => {
+                    // throttle resize so it's responsive but not jittery
+                    clearTimeout(window._rsz);
+                    window._rsz = setTimeout(resize, 120);
+                });
+                // init mouse center
+                mouse.x = 0.5; mouse.y = 0.5;
+                start();
+
+                // subtle hint auto-hide after a while
+                const hint = document.getElementById('hint');
+                setTimeout(() => { hint.style.opacity = '0'; hint.style.transform = 'translateY(6px)'; hint.style.transition = 'all 800ms ease'; }, 4200);
+            })();
+        </script>
 </body>
+
 </html>
