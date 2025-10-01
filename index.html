@@ -13,6 +13,11 @@
             padding: 0
         }
 
+        .center {
+            position: relative;
+            z-index: 99;
+        }
+
         html,
         body {
             height: 100%;
@@ -43,6 +48,19 @@
             height: 100%;
             display: block;
             z-index: 0;
+        }
+
+        /* Add this rule to your existing <style> block */
+        canvas#drawCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 2;
+            /* Put it above starsCanvas (z-index: 0) and nebula (z-index: 1) */
+            pointer-events: auto;
+            /* It must be able to receive mouse/touch events */
         }
 
         /* Soft nebula glows layered with blend modes */
@@ -98,6 +116,46 @@
             }
         }
 
+        /* Styling for the new mode toggle button */
+        .controls {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        #modeToggle {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s, border-color 0.3s;
+            outline: none;
+        }
+
+        #modeToggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
+        #clearConstellations {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s, border-color 0.3s;
+            outline: none;
+        }
+
+        #clearConstellations:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+
         /* small UI hint bottom-left */
         .hint {
             position: fixed;
@@ -139,332 +197,627 @@
             <div class="cloud c3"></div>
         </div>
 
+        <!-- Canvas for drawing constellation lines -->
+        <canvas id="drawCanvas"></canvas>
+
         <!-- Center content -->
         <div class="center" aria-hidden="false">
+            <div class="controls">
+                <button id="modeToggle">Current Mode: Constellation</button>
+                <button id="clearConstellations">Clear Constellations</button>
+            </div>
             <div class="hint" id="hint">Move your mouse — subtle parallax • Click to spawn a shooting star</div>
         </div>
 
         <script>
-            /* ---------------------------
-               Starfield + Shooting Stars
-               ---------------------------
-               Canvas draws:
-               - many small star particles (twinkling)
-               - occasional shooting stars (lines that fade)
-               - mouse parallax applied by offsetting star coordinates slightly
-            */
+            document.addEventListener('DOMContentLoaded', () => {
 
-            (() => {
-                const canvas = document.getElementById('starsCanvas');
-                const ctx = canvas.getContext('2d', { alpha: true });
-                let w = 0, h = 0, cx = 0, cy = 0;
-                let DPR = Math.max(1, window.devicePixelRatio || 1);
+    // New Global variables for Constellation Drawing
+    let drawCanvas;
+    let drawCtx;
+    let constellationLines = [];
+    let currentLine = [];
+    let longPressTimer = null;
+    let isLongPress = false;
+    let DPR = Math.max(1, window.devicePixelRatio || 1); // Define globally for all functions
+    
+    // Updated Global Flag: isPressing replaces isMouseDown
+    let isPressing = false; 
+    let starfallIntervalId = null;
+    const STARFALL_FIRE_RATE = 20; // Controls the speed (50 stars per second)
 
-                // Configuration
-                const STAR_COUNT = 600;        // base star count (scaled with size)
-                const STAR_MIN_R = 0.35;
-                const STAR_MAX_R = 1.6;
-                const TWINKLE_SPEED = 0.02;   // how fast twinkle phase moves
-                const SHOOT_PROB = 0.006;     // chance each frame to spawn a shooting star
-                const SHOOT_MIN_SPEED = 8;
-                const SHOOT_MAX_SPEED = 14;
-                const nebulaContainer = document.querySelector('.nebula');
-                const PARALLAX_STAR_X = 18;  // Max horizontal star shift (multiplied by DPR)
-                const PARALLAX_STAR_Y = 12;  // Max vertical star shift (multiplied by DPR)
-                const PARALLAX_NEBULA_X = -4; // Max horizontal nebula shift
-                const PARALLAX_NEBULA_Y = -3; // Max vertical nebula shift
+    // NEW: Mode control variable.
+    let currentMode = 'constellation'; // 'constellation' or 'starfall' 
 
-                const stage = document.getElementById('stage');
-                let mouse = { x: 0, y: 0, px: 0, py: 0 }; // mouse pos (0..1)
-                let smoothMouse = { x: 0.5, y: 0.5 };
-                const SMOOTH_FACTOR = 0.08; // How fast the smoothed value catches up
 
-                // Star object
-                class Star {
-                    constructor(x, y, r, alpha, tPhase) {
-                        this.x = x;
-                        this.y = y;
-                        this.r = r;
-                        this.baseAlpha = alpha;
-                        this.t = tPhase;
-                        this.twinkleSpeed = (Math.random() * 0.8 + 0.4) * TWINKLE_SPEED;
-                        this.dx = (Math.random() - 0.5) * 0.02;
-                        this.z = 0.3 + Math.random() * 0.7;
-                        this.hue = Math.random() < 0.7 ? 210 + Math.random() * 40 : 0;
-                    }
+    // --- CONSTELLATION DRAWING FUNCTIONS (Omitting for brevity, assume correct) ---
+
+    function drawCatmullRom(ctx, p0, p1, p2, p3, tension) {
+        const cp1x = p1.x + (p2.x - p0.x) * tension;
+        const cp1y = p1.y + (p2.y - p0.y) * tension;
+        const cp2x = p2.x - (p3.x - p1.x) * tension;
+        const cp2y = p2.y - (p3.y - p1.y) * tension;
+        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+    }
+
+    function drawStar(point) {
+        drawCtx.fillStyle = 'white';
+        drawCtx.shadowBlur = 10;
+        drawCtx.shadowColor = 'white';
+        drawCtx.beginPath();
+        drawCtx.arc(point.x, point.y, 4 * DPR, 0, Math.PI * 2);
+        drawCtx.fill();
+        drawCtx.shadowBlur = 0;
+    }
+
+    function redrawConstellations() {
+        if (!drawCtx || !drawCanvas) return;
+        drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+
+        for (const line of constellationLines) {
+            if (line.length === 0) continue;
+
+            const TENSION = 0.17;
+
+            // --- 1. Draw all Stars ---
+            const dprPoints = [];
+            for (const star of line) {
+                const dprStar = { x: star.x * DPR, y: star.y * DPR };
+                drawStar(dprStar);
+                dprPoints.push(dprStar);
+            }
+
+            if (dprPoints.length < 2) continue;
+
+            // --- 2. Draw the Smooth Line Path ---
+            drawCtx.strokeStyle = 'rgba(255,255,255,0.8)';
+            drawCtx.lineWidth = 2 * DPR;
+            drawCtx.shadowBlur = 5;
+            drawCtx.shadowColor = 'white';
+
+            drawCtx.beginPath();
+            drawCtx.moveTo(dprPoints[0].x, dprPoints[0].y);
+
+            for (let i = 1; i < dprPoints.length; i++) {
+                const p2 = line[i];
+                const p1 = line[i - 1];
+
+                let p_before_p1, p_after_p2;
+
+                if (line.length === 2) {
+                    p_before_p1 = p1;
+                    p_after_p2 = p2;
+                } else {
+                    p_before_p1 = (i === 1) ? p1 : line[i - 2];
+                    p_after_p2 = (i === line.length - 1) ? p2 : line[i + 1];
                 }
 
-                // Shooting star object - REPLACED WITH CLASS
-                class ShootingStar {
-                    constructor(x, y, vx, vy, life, length) {
-                        this.x = x;
-                        this.y = y;
-                        this.vx = vx;
-                        this.vy = vy;
-                        this.life = life;
-                        this.maxLife = life;
-                        this.length = length;
-                    }
+                const dpr_p_before_p1 = { x: p_before_p1.x * DPR, y: p_before_p1.y * DPR };
+                const dprP1 = { x: p1.x * DPR, y: p1.y * DPR };
+                const dprP2 = dprPoints[i];
+                const dpr_p_after_p2 = { x: p_after_p2.x * DPR, y: p_after_p2.y * DPR };
+
+                drawCatmullRom(drawCtx, dpr_p_before_p1, dprP1, dprP2, dpr_p_after_p2, TENSION);
+            }
+
+            drawCtx.stroke();
+            drawCtx.shadowBlur = 0;
+        }
+    }
+
+    function addStar(screenX, screenY, isNewLine = false) {
+        const newStar = { x: screenX, y: screenY };
+        const dprStar = { x: screenX * DPR, y: screenY * DPR };
+
+        drawStar(dprStar);
+
+        if (isNewLine || currentLine.length === 0) {
+            currentLine = [newStar];
+            constellationLines.push(currentLine);
+        } else {
+            currentLine.push(newStar);
+        }
+
+        redrawConstellations();
+    }
+
+    function clearConstellations() {
+        if (constellationLines.length === 0) return;
+        constellationLines = [];
+        currentLine = [];
+        if (drawCtx && drawCanvas) {
+            drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        }
+        console.log("Constellations cleared.");
+    }
+
+    const clearButton = document.getElementById('clearConstellations');
+    clearButton.addEventListener('click', clearConstellations);
+
+    // --- END CONSTELLATION FUNCTIONS ---
+
+    // NEW: Mode Toggling Function
+    function handleModeToggle() {
+        const toggleButton = document.getElementById('modeToggle');
+        const hint = document.getElementById('hint');
+
+        if (currentMode === 'constellation') {
+            currentMode = 'starfall';
+            toggleButton.textContent = 'Current Mode: Starfall';
+            hint.innerHTML = 'Move mouse • **Click to spawn shooting stars** • Shift + Click still creates a new constellation line.';
+        } else {
+            currentMode = 'constellation';
+            toggleButton.textContent = 'Current Mode: Constellation';
+            hint.innerHTML = 'Move mouse • **Click to draw/connect stars** • Shift + Click to start a new line • Mobile: Long-press to start new line.';
+        }
+    }
+
+    const starsCanvas = document.getElementById('starsCanvas');
+    const ctx = starsCanvas.getContext('2d', { alpha: true });
+
+    // Initialize Constellation Canvas
+    drawCanvas = document.getElementById('drawCanvas');
+    drawCtx = drawCanvas.getContext('2d', { alpha: true });
+
+    let w = 0, h = 0, cx = 0, cy = 0;
+    DPR = Math.max(1, window.devicePixelRatio || 1);
+
+    // Configuration 
+    const STAR_COUNT = 600;
+    const STAR_MIN_R = 0.35;
+    const STAR_MAX_R = 1.6;
+    const TWINKLE_SPEED = 0.02;
+    const SHOOT_PROB = 0.006;
+    const SHOOT_MIN_SPEED = 8;
+    const SHOOT_MAX_SPEED = 14;
+    const nebulaContainer = document.querySelector('.nebula');
+    const PARALLAX_STAR_X = 18;
+    const PARALLAX_STAR_Y = 12;
+    const PARALLAX_NEBULA_X = -4;
+    const PARALLAX_NEBULA_Y = -3;
+
+    const stage = document.getElementById('stage');
+    let mouse = { x: 0, y: 0, px: 0, py: 0 };
+    let smoothMouse = { x: 0.5, y: 0.5 };
+    const SMOOTH_FACTOR = 0.08;
+
+    // Star and ShootingStar classes (omitted for brevity)
+    class Star {
+        constructor(x, y, r, alpha, tPhase) {
+            this.x = x;
+            this.y = y;
+            this.r = r;
+            this.baseAlpha = alpha;
+            this.t = tPhase;
+            this.twinkleSpeed = (Math.random() * 0.8 + 0.4) * TWINKLE_SPEED;
+            this.dx = (Math.random() - 0.5) * 0.02;
+            this.z = 0.3 + Math.random() * 0.7;
+            this.hue = Math.random() < 0.7 ? 210 + Math.random() * 40 : 0;
+        }
+    }
+    class ShootingStar {
+        constructor(x, y, vx, vy, life, length) {
+            this.x = x;
+            this.y = y;
+            this.vx = vx;
+            this.vy = vy;
+            this.life = life;
+            this.maxLife = life;
+            this.length = length;
+        }
+    }
+    let stars = [], shoots = [];
+    let starSprites = {};
+
+    function resize() {
+        DPR = Math.max(1, window.devicePixelRatio || 1);
+
+        w = starsCanvas.width = Math.round(stage.clientWidth * DPR);
+        h = starsCanvas.height = Math.round(stage.clientHeight * DPR);
+        starsCanvas.style.width = stage.clientWidth + 'px';
+        starsCanvas.style.height = stage.clientHeight + 'px';
+
+        drawCanvas.width = w;
+        drawCanvas.height = h;
+        drawCanvas.style.width = stage.clientWidth + 'px';
+        drawCanvas.style.height = stage.clientHeight + 'px';
+
+        cx = w / 2; cy = h / 2;
+
+        initStars();
+        redrawConstellations();
+    }
+
+    function initStars() {
+        stars = [];
+        const area = (w * h) / (1000 * 1000);
+        const count = Math.round(STAR_COUNT * area * 1.4);
+        for (let i = 0; i < count; i++) {
+            const x = Math.random() * w;
+            const y = Math.random() * h;
+            const r = STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R);
+            const baseAlpha = 0.45 + Math.random() * 0.6;
+            const tPhase = Math.random() * Math.PI * 2;
+            const rQuantized = Math.round((STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R)) * 2) / 2;
+            stars.push(new Star(x, y, rQuantized, baseAlpha, tPhase));
+        }
+    }
+    function generateStarSprites(minR, maxR, count) {
+        const sprites = {};
+        for (let r = minR; r <= maxR; r += 0.5) {
+            const key = r.toFixed(1);
+            const size = r * 2 * DPR + 4;
+            const spriteCanvas = document.createElement('canvas');
+            spriteCanvas.width = spriteCanvas.height = size;
+            const sctx = spriteCanvas.getContext('2d');
+            const centerX = size / 2;
+
+            sctx.beginPath();
+            sctx.fillStyle = 'rgba(255, 255, 255, 1)';
+            sctx.arc(centerX, centerX, r * DPR, 0, Math.PI * 2);
+            sctx.fill();
+
+            sprites[key] = spriteCanvas;
+        }
+        return sprites;
+    }
+
+    function continuousStarfallLoop() {
+        // Use the generic isPressing flag
+        if (!isPressing || currentMode !== 'starfall') return;
+
+        // Use the raw global mouse position (mouse.x, mouse.y) for immediate response
+        const px = mouse.x;
+        const py = mouse.y;
+
+        spawnShootingStar({ x: px, y: py });
+        // Spawn a second star only occasionally to prevent overpowering the effect
+        if (Math.random() < 0.4) {
+            spawnShootingStar({ x: px, y: py });
+        }
+    }
+
+    function spawnShootingStar(manualPos) {
+        const SHOOT_MIN_SPEED = 8;
+        const SHOOT_MAX_SPEED = 14;
+        const w = drawCanvas.width;
+        const h = drawCanvas.height;
+        const cx = w / 2;
+        const cy = h / 2;
+
+        let x, y, speed, angleToCenter, angleOffset;
+
+        if (manualPos) {
+            // --- MANUAL SPAWN LOGIC (Click/Tap) ---
+            x = manualPos.x * w;
+            y = manualPos.y * h;
+
+            angleToCenter = Math.atan2(y - cy, x - cx);
+            angleOffset = (Math.random() - 0.5) * 0.8;
+            const ang = angleToCenter + angleOffset;
+
+            speed = SHOOT_MAX_SPEED * 1.5 + Math.random() * 5;
+            const vx = Math.cos(ang) * speed;
+            const vy = Math.sin(ang) * speed;
+
+            const life = Math.round(50 + Math.random() * 40);
+            const length = 150 + Math.random() * 150;
+
+            shoots.push(new ShootingStar(x, y, vx, vy, life, length));
+            return;
+
+        } else {
+            // --- AUTOMATIC SPAWN LOGIC ---
+            const startFrom = Math.random();
+
+            // 1. Determine starting edge 
+            if (startFrom < 0.5) { // Left or Top Edge
+                if (Math.random() < 0.6) { // Left-side start
+                    x = -10 - Math.random() * w * 0.1;
+                    y = Math.random() * h * 0.4;
+                } else { // Top-side start
+                    x = Math.random() * w * 0.4;
+                    y = -10 - Math.random() * h * 0.1;
                 }
-
-                let stars = [], shoots = [];
-
-                function resize() {
-                    DPR = Math.max(1, window.devicePixelRatio || 1);
-                    w = canvas.width = Math.round(stage.clientWidth * DPR);
-                    h = canvas.height = Math.round(stage.clientHeight * DPR);
-                    canvas.style.width = stage.clientWidth + 'px';
-                    canvas.style.height = stage.clientHeight + 'px';
-                    cx = w / 2; cy = h / 2;
-                    // regenerate stars based on new size
-                    initStars();
+            } else { // Right or Bottom Edge
+                if (Math.random() < 0.6) { // Right-side start
+                    x = w + 10 + Math.random() * w * 0.1;
+                    y = Math.random() * h * 0.4;
+                } else { // Bottom-side start
+                    x = Math.random() * w * 0.4;
+                    y = h + 10 + Math.random() * h * 0.1;
                 }
+            }
 
-                function generateStarSprites(minR, maxR, count) {
-                    const sprites = {};
-                    for (let r = minR; r <= maxR; r += 0.5) {
-                        const key = r.toFixed(1);
-                        const size = r * 2 * DPR + 4; // Add padding
-                        const spriteCanvas = document.createElement('canvas');
-                        spriteCanvas.width = spriteCanvas.height = size;
-                        const sctx = spriteCanvas.getContext('2d');
-                        const centerX = size / 2;
+            // 2. Calculate Angle: Aim towards the center, but add a substantial random spread
+            angleToCenter = Math.atan2(cy - y, cx - x);
+            angleOffset = (Math.random() - 0.5) * 0.8;
+            const ang = angleToCenter + angleOffset;
 
-                        // Draw the core star
-                        sctx.beginPath();
-                        sctx.fillStyle = 'rgba(255, 255, 255, 1)'; // Draw max brightness
-                        sctx.arc(centerX, centerX, r * DPR, 0, Math.PI * 2);
-                        sctx.fill();
+            // 3. Set Speed and Create Star
+            speed = SHOOT_MIN_SPEED + Math.random() * (SHOOT_MAX_SPEED - SHOOT_MIN_SPEED);
+            const vx = Math.cos(ang) * speed;
+            const vy = Math.sin(ang) * speed;
 
-                        // Store the canvas image
-                        sprites[key] = spriteCanvas;
-                    }
-                    return sprites;
-                }
+            const life = Math.round(30 + Math.random() * 45);
+            const length = 90 + Math.random() * 140;
 
-                let starSprites = {}; // Global variable, near 'stars = []'
+            shoots.push(new ShootingStar(x, y, vx, vy, life, length));
+        }
+    }
 
-                function initStars() {
-                    stars = [];
-                    const area = (w * h) / (1000 * 1000);
-                    const count = Math.round(STAR_COUNT * area * 1.4);
-                    starSprites = generateStarSprites(STAR_MIN_R, STAR_MAX_R, 6);
-                    for (let i = 0; i < count; i++) {
-                        const x = Math.random() * w;
-                        const y = Math.random() * h;
-                        const r = STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R);
-                        const baseAlpha = 0.45 + Math.random() * 0.6;
-                        const tPhase = Math.random() * Math.PI * 2;
-                        const rQuantized = Math.round((STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R)) * 2) / 2;
-                        stars.push(new Star(x, y, rQuantized, baseAlpha, tPhase));
-                    }
-                }
+    let lastTs = 0;
+    function animate(ts) {
+        const dt = Math.min(60, ts - lastTs);
+        lastTs = ts;
+        ctx.clearRect(0, 0, w, h);
 
-                // spawn shooting star from random edge
-                function spawnShootingStar(manualPos) {
-                    // pick random angle across screen; prefer top-left -> bottom-right diagonals
-                    const startFrom = Math.random();
-                    let x, y, tx, ty, speed;
-                    if (manualPos) { // spawned via click - start near mouse, go diagonally
-                        const x = manualPos.x * w;
-                        const y = manualPos.y * h;
+        const dtFactor = dt / 16;
+        smoothMouse.x += (mouse.x - smoothMouse.x) * SMOOTH_FACTOR * dtFactor;
+        smoothMouse.y += (mouse.y - smoothMouse.y) * SMOOTH_FACTOR * dtFactor;
+        const parx = (smoothMouse.x - 0.5) * PARALLAX_STAR_X * DPR;
+        const pary = (smoothMouse.y - 0.5) * PARALLAX_STAR_Y * DPR;
+        const nebulaParallaxX = (smoothMouse.x - 0.5) * PARALLAX_NEBULA_X;
+        const nebulaParallaxY = (smoothMouse.y - 0.5) * PARALLAX_NEBULA_Y;
+        nebulaContainer.style.transform = `translate(${nebulaParallaxX}px, ${nebulaParallaxY}px)`;
 
-                        // IMPROVED ANGLE: Calculate angle from the click point TOWARDS the center (cx, cy)
-                        const angleToCenter = Math.atan2(cy - y, cx - x);
+        // Star drawing loop
+        for (let i = 0; i < stars.length; i++) {
+            const s = stars[i];
+            s.t += s.twinkleSpeed * (dt / 16);
+            const tw = (Math.sin(s.t) + 1) / 2;
+            const alpha = Math.max(0.05, Math.min(1, s.baseAlpha * (0.6 + 0.6 * tw)));
+            const parallaxFactor = 1.0 - s.z;
+            const x = Math.round(s.x + parx * parallaxFactor * 0.5);
+            const y = Math.round(s.y + pary * parallaxFactor * 0.5);
 
-                        // Set the star angle to be mostly away from the center, with a slight random variance.
-                        // Add Math.PI to 'angleToCenter' to point AWAY from the center.
-                        const ang = angleToCenter + Math.PI + (Math.random() - 0.5) * 0.4;
+            if (s.r > 1.2) {
+                const g = ctx.createRadialGradient(x, y, 0, x, y, s.r * 9 * DPR);
+                g.addColorStop(0, `rgba(180,220,255,${(alpha * 0.22).toFixed(3)})`);
+                g.addColorStop(0.4, `rgba(120,200,255,${(alpha * 0.09).toFixed(3)})`);
+                g.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(x, y, s.r * 9 * DPR, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.beginPath();
+            let starColor;
+            if (s.hue === 0) {
+                starColor = `rgba(255,255,255,${alpha.toFixed(3)})`;
+            } else {
+                const lightness = 80 + s.r * 10;
+                starColor = `hsla(${s.hue}, 100%. ${lightness}%, ${alpha.toFixed(3)})`;
+            }
+            ctx.fillStyle = starColor;
+            ctx.arc(x, y, s.r * DPR, 0, Math.PI * 2);
+            ctx.fill();
 
-                        const speed = SHOOT_MIN_SPEED + Math.random() * (SHOOT_MAX_SPEED - SHOOT_MIN_SPEED);
-                        const vx = Math.cos(ang) * speed;
-                        const vy = Math.sin(ang) * speed;
-                        shoots.push(new ShootingStar(x, y, vx, vy, Math.round(40 + Math.random() * 34), 120 + Math.random() * 120));
-                        return;
-                    }
+            s.x += s.dx * (dt / 16);
+            if (s.x < -20) s.x = w + 20;
+            if (s.x > w + 20) s.x = -20;
+            if (s.y < -20) s.y = h + 20;
+            if (s.y > h + 20) s.y = -20;
+        }
 
-                    if (startFrom < 0.5) {
-                        // from left/top edges
-                        if (Math.random() < 0.6) { x = Math.random() * w * 0.2; y = -10 - Math.random() * h * 0.1; }
-                        else { x = -10 - Math.random() * w * 0.1; y = Math.random() * h * 0.2; }
-                    } else {
-                        // from right/top
-                        if (Math.random() < 0.6) { x = w + 10 + Math.random() * w * 0.2; y = -10 - Math.random() * h * 0.1; }
-                        else { x = w + 10 + Math.random() * w * 0.1; y = Math.random() * h * 0.2; }
-                    }
-                    // aim roughly across center with some variance
-                    const angleToCenter = Math.atan2(cy - y, cx - x) + (Math.random() - 0.5) * 0.6;
-                    speed = SHOOT_MIN_SPEED + Math.random() * (SHOOT_MAX_SPEED - SHOOT_MIN_SPEED);
-                    const vx = Math.cos(angleToCenter) * speed;
-                    const vy = Math.sin(angleToCenter) * speed;
-                    shoots.push(new ShootingStar(x, y, vx, vy, Math.round(30 + Math.random() * 45), 90 + Math.random() * 140));
-                }
+        // Shooting star loop 
+        for (let i = shoots.length - 1; i >= 0; i--) {
+            const sh = shoots[i];
+            const f = sh.life / sh.maxLife;
+            const tx = sh.x - sh.vx * (sh.length / 80);
+            const ty = sh.y - sh.vy * (sh.length / 80);
 
-                // Render
-                let lastTs = 0;
-                function animate(ts) {
-                    const dt = Math.min(60, ts - lastTs);
-                    lastTs = ts;
-                    ctx.clearRect(0, 0, w, h);
+            // --- TAPERED TAIL DRAWING ---
+            const g = ctx.createLinearGradient(sh.x, sh.y, tx, ty);
+            g.addColorStop(0, `rgba(255,255,255,${(0.98 * f).toFixed(3)})`);
+            g.addColorStop(0.2, `rgba(180,220,255,${(0.5 * f).toFixed(3)})`);
+            g.addColorStop(0.6, `rgba(100,150,255,${(0.15 * f).toFixed(3)})`);
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 1.8 * DPR;
+            ctx.beginPath();
+            ctx.moveTo(sh.x, sh.y);
+            ctx.lineTo(tx, ty);
+            ctx.stroke();
 
-                    // compute smoothed mouse pos (Linear Interpolation)
-                    const dtFactor = dt / 16; // Use delta time to make smoothing frame-rate independent
+            // --- DYNAMIC HEAD DRAWING ---
+            const pulse = (Math.sin(sh.life * 0.4) * 0.2) + 1;
+            const headRadius = 2.6 * DPR * Math.min(1.3, f * 1.6) * pulse;
+            ctx.beginPath();
+            ctx.fillStyle = `rgba(255,255,255,${(0.98 * f).toFixed(3)})`;
+            ctx.arc(sh.x, sh.y, headRadius, 0, Math.PI * 2);
+            ctx.fill();
 
-                    smoothMouse.x += (mouse.x - smoothMouse.x) * SMOOTH_FACTOR * dtFactor;
-                    smoothMouse.y += (mouse.y - smoothMouse.y) * SMOOTH_FACTOR * dtFactor;
+            sh.x += sh.vx * (dt / 16);
+            sh.y += sh.vy * (dt / 16);
+            sh.life -= (dt / 16);
 
-                    // compute parallax offset (small)
-                    const parx = (smoothMouse.x - 0.5) * PARALLAX_STAR_X * DPR;
-                    const pary = (smoothMouse.y - 0.5) * PARALLAX_STAR_Y * DPR;
+            if (sh.life <= 0 || sh.x < -200 || sh.x > w + 200 || sh.y < -200 || sh.y > h + 200) {
+                shoots.splice(i, 1);
+            }
+        }
+        if (Math.random() < SHOOT_PROB) spawnShootingStar();
+        requestAnimationFrame(animate);
+    }
 
-                    const nebulaParallaxX = (smoothMouse.x - 0.5) * PARALLAX_NEBULA_X;
-                    const nebulaParallaxY = (smoothMouse.y - 0.5) * PARALLAX_NEBULA_Y;
-                    // Set the CSS transform property
-                    nebulaContainer.style.transform = `translate(${nebulaParallaxX}px, ${nebulaParallaxY}px)`;
+    // Mouse handling for parallax
+    function onMouseMove(e) {
+        const rect = starsCanvas.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) || 0.5;
+        mouse.y = ((e.clientY - rect.top) / rect.height) || 0.5;
+    }
+    function onTouchMove(e) {
+        if (!e.touches || e.touches.length === 0) return;
+        const t = e.touches[0];
+        onMouseMove({ clientX: t.clientX, clientY: t.clientY });
+    }
+    starsCanvas.addEventListener('mousemove', onMouseMove);
+    starsCanvas.addEventListener('touchmove', onTouchMove, { passive: true });
 
-                    // draw stars
-                    for (let i = 0; i < stars.length; i++) {
-                        const s = stars[i];
-                        // twinkle phase update
-                        s.t += s.twinkleSpeed * (dt / 16);
-                        const tw = (Math.sin(s.t) + 1) / 2; // 0..1
-                        const alpha = Math.max(0.05, Math.min(1, s.baseAlpha * (0.6 + 0.6 * tw)));
-                        const parallaxFactor = 1.0 - s.z;
-                        const depthFactor = 1.0 - s.z;
-                        const x = Math.round(s.x + parx * parallaxFactor * 0.5);
-                        const y = Math.round(s.y + pary * parallaxFactor * 0.5);
-                        // draw glow for bigger stars
-                        if (s.r > 1.2) {
-                            const g = ctx.createRadialGradient(x, y, 0, x, y, s.r * 9 * DPR);
-                            g.addColorStop(0, `rgba(180,220,255,${(alpha * 0.22).toFixed(3)})`);
-                            g.addColorStop(0.4, `rgba(120,200,255,${(alpha * 0.09).toFixed(3)})`);
-                            g.addColorStop(1, 'rgba(0,0,0,0)');
-                            ctx.fillStyle = g;
-                            ctx.beginPath();
-                            ctx.arc(x, y, s.r * 9 * DPR, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-                        // core
-                        ctx.beginPath();
-                        let starColor;
-                        if (s.hue === 0) {
-                            // Pure White
-                            starColor = `rgba(255,255,255,${alpha.toFixed(3)})`;
-                        } else {
-                            // Tinted color using HSL (Saturation and Lightness fixed, Alpha uses twinkle)
-                            const lightness = 80 + s.r * 10; // Slightly brighter larger stars
-                            starColor = `hsla(${s.hue}, 100%. ${lightness}%, ${alpha.toFixed(3)})`;
-                        }
-                        ctx.fillStyle = starColor;
-                        ctx.arc(x, y, s.r * DPR, 0, Math.PI * 2);
-                        ctx.fill();
 
-                        // tiny drift
-                        s.x += s.dx * (dt / 16);
-                        if (s.x < -20) s.x = w + 20;
-                        if (s.x > w + 20) s.x = -20;
-                        if (s.y < -20) s.y = h + 20;
-                        if (s.y > h + 20) s.y = -20;
-                    }
+    // Function to handle continuous updating when the mouse or touch is pressing
+    function onMouseHoldMove(e) {
+        // Use isPressing
+        if (!isPressing) return;
 
-                    // update and draw shooting stars (lines + glow)
-                    for (let i = shoots.length - 1; i >= 0; i--) {
-                        const sh = shoots[i];
-                        // fade factor
-                        const f = sh.life / sh.maxLife;
-                        // tail end point
-                        const tx = sh.x - sh.vx * (sh.length / 80);
-                        const ty = sh.y - sh.vy * (sh.length / 80);
+        // Use the coordinates from the active event
+        const rect = starsCanvas.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+        
+        const normalizedX = ((clientX - rect.left) / rect.width) || 0.5;
+        const normalizedY = ((clientY - rect.top) / rect.height) || 0.5;
 
-                        // gradient for tail
-                        const g = ctx.createLinearGradient(sh.x, sh.y, tx, ty);
-                        g.addColorStop(0, `rgba(255,255,255,${(0.95 * f).toFixed(3)})`);
-                        g.addColorStop(0.6, `rgba(180,220,255,${(0.35 * f).toFixed(3)})`);
-                        g.addColorStop(1, `rgba(100,150,255,${(0.02 * f).toFixed(3)})`);
+        // Update the raw global mouse object instantly
+        mouse.x = normalizedX;
+        mouse.y = normalizedY;
+    }
 
-                        ctx.strokeStyle = g;
-                        ctx.lineWidth = 1.8 * DPR;
-                        ctx.beginPath();
-                        ctx.moveTo(sh.x, sh.y);
-                        ctx.lineTo(tx, ty);
-                        ctx.stroke();
+    // --- UPDATED MOUSE EVENT HANDLERS FOR drawCanvas (using isPressing) ---
 
-                        // bright head
-                        ctx.beginPath();
-                        ctx.fillStyle = `rgba(255,255,255,${(0.98 * f).toFixed(3)})`;
-                        ctx.arc(sh.x, sh.y, 2.6 * DPR * Math.min(1.3, f * 1.6), 0, Math.PI * 2);
-                        ctx.fill();
+    // 1. MOUSE DOWN: Start the loop AND start listening for movement
+    drawCanvas.addEventListener('mousedown', (e) => {
+        if (currentMode !== 'starfall' || e.shiftKey) return;
 
-                        // update
-                        sh.x += sh.vx * (dt / 16);
-                        sh.y += sh.vy * (dt / 16);
-                        sh.life -= (dt / 16);
-                        // remove if life ended or far outside screen
-                        if (sh.life <= 0 || sh.x < -200 || sh.x > w + 200 || sh.y < -200 || sh.y > h + 200) {
-                            shoots.splice(i, 1);
-                        }
-                    }
+        isPressing = true; // Use isPressing
 
-                    // sometimes spawn new shooting star
-                    if (Math.random() < SHOOT_PROB) spawnShootingStar();
+        // Attach the dedicated continuous move tracker to the document body
+        document.body.addEventListener('mousemove', onMouseHoldMove);
 
-                    requestAnimationFrame(animate);
-                }
+        // Crucial: Set the initial position immediately
+        onMouseHoldMove(e);
 
-                // Mouse handling for parallax and click to spawn star
-                function onMouseMove(e) {
-                    const rect = canvas.getBoundingClientRect();
-                    mouse.x = ((e.clientX - rect.left) / rect.width) || 0.5;
-                    mouse.y = ((e.clientY - rect.top) / rect.height) || 0.5;
-                }
-                function onTouchMove(e) {
-                    if (!e.touches || e.touches.length === 0) return;
-                    const t = e.touches[0];
-                    onMouseMove({ clientX: t.clientX, clientY: t.clientY });
-                }
-                canvas.addEventListener('mousemove', onMouseMove);
-                canvas.addEventListener('touchmove', onTouchMove, { passive: true });
+        // Start the interval loop
+        starfallIntervalId = setInterval(continuousStarfallLoop, STARFALL_FIRE_RATE);
+    });
 
-                // click to spawn shooting star at pointer
-                canvas.addEventListener('click', (ev) => {
-                    const rect = canvas.getBoundingClientRect();
-                    const px = (ev.clientX - rect.left) / rect.width;
-                    const py = (ev.clientY - rect.top) / rect.height;
-                    spawnShootingStar({ x: px, y: py });
-                    // small visual feedback: create a short bright burst by adding 2-3 tiny shoots
-                    for (let i = 0; i < 2; i++) {
-                        spawnShootingStar({ x: px, y: py });
-                    }
-                });
+    // 2. MOUSE UP: Stop the loop AND stop listening for movement
+    document.body.addEventListener('mouseup', () => {
+        if (!isPressing) return; // Only run if we were actually holding the button down
 
-                // keyboard toggles: press 's' to spawn a burst
-                window.addEventListener('keydown', (e) => {
-                    if (e.key.toLowerCase() === 's') {
-                        spawnShootingStar();
-                        spawnShootingStar();
-                    }
-                });
+        isPressing = false; // Use isPressing
+        document.body.removeEventListener('mousemove', onMouseHoldMove);
+        if (starfallIntervalId) {
+            clearInterval(starfallIntervalId);
+            starfallIntervalId = null;
+        }
+    });
 
-                // init
-                function start() {
-                    resize();
-                    lastTs = performance.now();
-                    requestAnimationFrame(animate);
-                }
+    // 3. MOUSE LEAVE (Safety stop for drawCanvas area)
+    drawCanvas.addEventListener('mouseleave', () => {
+        if (isPressing && currentMode === 'starfall') { // Use isPressing
+             isPressing = false; // Use isPressing
+             document.body.removeEventListener('mousemove', onMouseHoldMove);
+             if (starfallIntervalId) {
+                 clearInterval(starfallIntervalId);
+                 starfallIntervalId = null;
+             }
+        }
+    });
 
-                window.addEventListener('resize', () => {
-                    // throttle resize so it's responsive but not jittery
-                    clearTimeout(window._rsz);
-                    window._rsz = setTimeout(resize, 120);
-                });
-                // init mouse center
-                mouse.x = 0.5; mouse.y = 0.5;
-                start();
+    // 4. CONSTELLATION MODE CLICKS: Handles single clicks for constellation drawing
+    drawCanvas.addEventListener('click', (e) => {
+        if (e.pointerType !== "mouse") return;
+        
+        // Prevents a click event from firing after a mousedown/mouseup sequence
+        if (currentMode === 'starfall' && !e.shiftKey) return; 
 
-                // subtle hint auto-hide after a while
-                const hint = document.getElementById('hint');
-                setTimeout(() => { hint.style.opacity = '0'; hint.style.transform = 'translateY(6px)'; hint.style.transition = 'all 800ms ease'; }, 4200);
-            })();
+        const rect = drawCanvas.getBoundingClientRect();
+        const clientX = e.clientX - rect.left;
+        const clientY = e.clientY - rect.top;
+
+        if (e.shiftKey || currentMode === 'constellation') {
+            addStar(clientX, clientY, e.shiftKey);
+        }
+    });
+
+    // --- NEW TOUCH EVENT HANDLERS FOR drawCanvas (Touch-and-Drag Starfall) ---
+    
+    // 1. TOUCH START: Start the Starfall loop or the Constellation long-press timer
+    drawCanvas.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent default mobile scrolling/zoom behavior
+        const touch = e.touches[0];
+        
+        if (currentMode === 'starfall') {
+            isPressing = true;
+            
+            // Attach onMouseHoldMove to the body to track movement during press
+            document.body.addEventListener('touchmove', onMouseHoldMove);
+            
+            // Crucial: Set the initial position immediately using the touch coordinates
+            onMouseHoldMove(e);
+            
+            // Start the continuous starfall loop
+            starfallIntervalId = setInterval(continuousStarfallLoop, STARFALL_FIRE_RATE);
+            
+        } else if (currentMode === 'constellation') {
+            // Constellation long-press logic
+            isLongPress = false;
+            longPressTimer = setTimeout(() => {
+                isLongPress = true;
+            }, 500);
+        }
+    }, { passive: false });
+
+
+    // 2. TOUCH END: Stops the Starfall loop OR handles Constellation tap/long-press
+    document.body.addEventListener('touchend', (e) => {
+        
+        // Clean up Starfall if it was running
+        if (isPressing) {
+            isPressing = false;
+            document.body.removeEventListener('touchmove', onMouseHoldMove);
+            if (starfallIntervalId) {
+                clearInterval(starfallIntervalId);
+                starfallIntervalId = null;
+            }
+        }
+        
+        // Clean up Constellation long-press timer
+        clearTimeout(longPressTimer);
+        
+        // Handle single tap for Constellation Mode only
+        if (currentMode === 'constellation') {
+            const touch = e.changedTouches[0];
+            const rect = drawCanvas.getBoundingClientRect();
+            const clientX = touch.clientX - rect.left;
+            const clientY = touch.clientY - rect.top;
+
+            const isNewLine = isLongPress;
+            // Only add a star if the touch didn't move much (to filter out a drag)
+            if (!isPressing) { // If isPressing is false, it means it was a tap/short press
+                addStar(clientX, clientY, isNewLine);
+            }
+        } 
+    });
+    // --- END TOUCH EVENT HANDLERS ---
+
+    // keyboard toggles: press 's' to spawn a burst
+    window.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 's') {
+            spawnShootingStar();
+            spawnShootingStar();
+        }
+    });
+
+    // init
+    function start() {
+        resize();
+        lastTs = performance.now();
+        requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => {
+        clearTimeout(window._rsz);
+        window._rsz = setTimeout(resize, 120);
+    });
+
+    // --- BUTTON FIX: Get element and attach listener here ---
+    const toggleButton = document.getElementById('modeToggle');
+    toggleButton.addEventListener('click', handleModeToggle);
+    
+    start();
+});
         </script>
 </body>
 
