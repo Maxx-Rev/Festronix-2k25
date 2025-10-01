@@ -1,824 +1,911 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Festronix — Cosmic Motion</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festronix - College Events Registration</title>
+    <meta name="description" content="Experience stellar college events at Festronix. Register for hackathons, robotics competitions, cultural fests, and sports events. Where innovation meets the cosmos!">
     <style>
-        /* Reset */
         * {
-            box-sizing: border-box;
             margin: 0;
-            padding: 0
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .center {
-            position: relative;
-            z-index: 99;
+        :root {
+            --bg-primary: hsl(240, 50%, 5%);
+            --text-primary: hsl(240, 10%, 95%);
+            --text-muted: hsl(240, 10%, 60%);
+            --primary: hsl(270, 80%, 60%);
+            --secondary: hsl(320, 70%, 55%);
+            --accent: hsl(180, 100%, 50%);
+            --card-bg: hsl(250, 40%, 10%);
+            --border: hsl(250, 30%, 20%);
         }
 
-        html,
         body {
-            height: 100%;
-            background: #020217;
-            overflow: hidden;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* Layout */
-        .stage {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            display: grid;
-            place-items: center;
-            background: radial-gradient(1200px 600px at 10% 20%, rgba(62, 16, 90, 0.18), transparent 10%),
-                radial-gradient(900px 400px at 85% 80%, rgba(12, 34, 90, 0.12), transparent 8%),
-                linear-gradient(180deg, #04031a 0%, #050417 40%, #08102a 100%);
-            isolation: isolate;
-            cursor: default;
-        }
-
-        /* Canvas sits underneath the UI */
-        canvas#starsCanvas {
-            position: absolute;
+        /* Star Field Canvas */
+        #starfield {
+            position: fixed;
             inset: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
+            pointer-events: none;
             z-index: 0;
         }
 
-        /* Add this rule to your existing <style> block */
-        canvas#drawCanvas {
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .hero::before {
+            content: '';
             position: absolute;
             inset: 0;
+            background: linear-gradient(to bottom, rgba(12, 10, 28, 0.5), rgba(12, 10, 28, 0.3), rgba(12, 10, 28, 1));
+        }
+
+        .hero .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+            max-width: 1200px;
+        }
+
+        .hero .logo-main {
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: 700;
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+            -webkit-background-clip: text;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: float 6s ease-in-out infinite, glow-pulse 3s ease-in-out infinite, fade-in-up 0.8s ease-out;
+        }
+
+        .hero h2 {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            letter-spacing: 2px;
+            animation: fade-in-up 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            line-height: 1.8;
+            animation: fade-in-up 0.8s ease-out 0.2s backwards;
+        }
+
+        .scroll-indicator {
+            position: relative;
+            top: 2rem;
+            bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            animation: fade-in-up 1.2s ease-out 0.2s both;
+        }
+
+        .scroll-text {
+            font-size: 1.25rem;
+            color: hsl(210, 40%, 60%);
+            margin-bottom: 1rem;
+        }
+
+        .scroll-arrow {
+            width: 2rem;
+            height: 3.5rem;
+            border: 2px solid hsl(260, 100%, 65%, 0.5);
+            border-radius: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .scroll-dot {
+            width: 0.3rem;
+            height: 1rem;
+            background: hsl(260, 100%, 65%);
+            border-radius: 0.25rem;
+            margin-top: 0.75rem;
+            animation: bounce 2s infinite;
+        }
+
+
+        /* Section Styles */
+        section {
+            position: relative;
+            padding: 6rem 2rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .about-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .about-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .about-card svg {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 1rem;
+        }
+
+        .about-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .about-card p {
+            color: var(--text-muted);
+        }
+
+        /* Events Section */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .event-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.5s;
+            position: relative;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), transparent, rgba(236, 72, 153, 0.2));
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .event-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .event-card:hover::before {
+            opacity: 1;
+        }
+
+        .event-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.7s;
+        }
+
+        .event-card:hover .event-image {
+            transform: scale(1.1);
+        }
+
+        .event-content {
+            padding: 1.5rem;
+        }
+
+        .event-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s;
+        }
+
+        .event-card:hover h3 {
+            color: var(--primary);
+        }
+
+        .event-description {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .event-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .event-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .event-detail svg {
+            width: 16px;
+            height: 16px;
+            color: var(--accent);
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .register-btn:hover {
+            background: hsl(270, 80%, 55%);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+        }
+
+        /* Gallery Section */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            aspect-ratio: 16/9;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.5s;
+            position: relative;
+        }
+
+        .gallery-item img {
             width: 100%;
             height: 100%;
-            display: block;
-            z-index: 2;
-            /* Put it above starsCanvas (z-index: 0) and nebula (z-index: 1) */
-            pointer-events: auto;
-            /* It must be able to receive mouse/touch events */
+            object-fit: cover;
+            transition: transform 0.7s;
         }
 
-        /* Soft nebula glows layered with blend modes */
-        .nebula {
+        .gallery-item:hover {
+            border-color: var(--primary);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-item::after {
+            content: '';
             position: absolute;
             inset: 0;
-            z-index: 1;
-            pointer-events: none;
+            background: linear-gradient(to top, rgba(167, 139, 250, 0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.5s;
         }
 
-        .nebula .cloud {
-            position: absolute;
-            width: 120vmax;
-            height: 60vmax;
-            filter: blur(60px) saturate(140%);
-            mix-blend-mode: screen;
-            opacity: 0.55;
-            animation: floatCloud 30s linear infinite;
-            will-change: transform;
+        .gallery-item:hover::after {
+            opacity: 1;
         }
 
-        .cloud.c1 {
-            background: radial-gradient(closest-side, rgba(20, 185, 255, 0.12), rgba(10, 10, 40, 0));
-            transform: translate(-55%, -46%) rotate(8deg) scaleX(1.2);
-            animation-duration: 32s;
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
         }
 
-        .cloud.c2 {
-            background: radial-gradient(closest-side, rgba(160, 50, 200, 0.12), rgba(10, 10, 40, 0));
-            transform: translate(-50%, -52%) rotate(-6deg) scaleX(1.0);
-            animation-duration: 38s;
-            opacity: 0.6;
-        }
-
-        .cloud.c3 {
-            background: radial-gradient(closest-side, rgba(255, 60, 140, 0.08), rgba(10, 10, 40, 0));
-            transform: translate(-45%, -50%) rotate(22deg) scaleX(1.25);
-            animation-duration: 45s;
-            opacity: 0.45;
-        }
-
-        @keyframes floatCloud {
-            0% {
-                transform: translate(-50%, -50%) rotate(0deg)
-            }
-
-            50% {
-                transform: translate(-48%, -52%) rotate(3deg)
-            }
-
-            100% {
-                transform: translate(-50%, -50%) rotate(0deg)
-            }
-        }
-
-        /* Styling for the new mode toggle button */
-        .controls {
+        .contact-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
             text-align: center;
-            margin-bottom: 10px;
+            transition: all 0.3s;
         }
 
-        #modeToggle {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s, border-color 0.3s;
-            outline: none;
+        .contact-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+            transform: translateY(-5px);
         }
 
-        #modeToggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: white;
+        .contact-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
         }
 
-        #clearConstellations {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s, border-color 0.3s;
-            outline: none;
+        .contact-icon.email {
+            background: rgba(167, 139, 250, 0.2);
         }
 
-        #clearConstellations:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: white;
+        .contact-icon.phone {
+            background: rgba(236, 72, 153, 0.2);
         }
 
-        /* small UI hint bottom-left */
-        .hint {
-            position: fixed;
-            left: 14px;
-            bottom: 12px;
-            z-index: 4;
-            font-size: 12px;
-            color: rgba(200, 220, 255, 0.6);
-            background: rgba(5, 8, 18, 0.5);
-            padding: 8px 10px;
-            border-radius: 8px;
-            backdrop-filter: blur(4px);
-            pointer-events: auto;
+        .contact-icon.location {
+            background: rgba(6, 182, 212, 0.2);
         }
 
-        /* Responsive tweaks */
-        @media (max-width:560px) {
-            .hint {
-                font-size: 11px;
-                padding: 6px 8px
+        .contact-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .contact-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-card a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-card a:hover {
+            color: var(--primary);
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Animations */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        @keyframes slide-up {
+            0% { transform: translateY(100px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes cosmicPulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px hsla(var(--primary), 0.3));
+            }
+            50% {
+                filter: drop-shadow(0 0 40px hsla(var(--primary), 0.6)) drop-shadow(0 0 60px hsla(var(--primary), 0.3));
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { 
+                opacity: 1; 
+                filter: drop-shadow(0 0 10px hsl(270, 80%, 60%));
+            }
+            50% { 
+                opacity: 0.8; 
+                filter: drop-shadow(0 0 30px hsl(270, 80%, 60%));
+            }
+        }
+
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scale-in {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .fade-in-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+
+            .hero h2 {
+                font-size: 1.5rem;
             }
 
-            .logoText {
-                letter-spacing: 3px
+            .hero p {
+                font-size: 1rem;
             }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .events-grid,
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero .logo-main {
+                max-width: 500px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            section {
+                padding: 4rem 1rem;
+            }
+
+            .hero .logo-main {
+                max-width: 350px;
+            }
+
         }
     </style>
 </head>
-
 <body>
-    <div class="stage" id="stage">
-        <!-- Canvas for stars and shooting stars -->
-        <canvas id="starsCanvas"></canvas>
+    <!-- Star Field Canvas -->
+    <canvas id="starfield"></canvas>
 
-        <!-- Nebula glows -->
-        <div class="nebula" aria-hidden="true">
-            <div class="cloud c1"></div>
-            <div class="cloud c2"></div>
-            <div class="cloud c3"></div>
-        </div>
-
-        <!-- Canvas for drawing constellation lines -->
-        <canvas id="drawCanvas"></canvas>
-
-        <!-- Center content -->
-        <div class="center" aria-hidden="false">
-            <div class="controls">
-                <button id="modeToggle">Current Mode: Constellation</button>
-                <button id="clearConstellations">Clear Constellations</button>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="content">
+            <h1 class="logo-main">FESTRONIX</h1>
+            
+            <h2>Where Innovation Meets the Cosmos</h2>
+            
+            <p>
+                Embark on an extraordinary journey through our stellar lineup of events. 
+                From cutting-edge technology to vibrant cultural celebrations, 
+                Festronix brings together the brightest minds for an unforgettable experience.
+            </p>
+            
+            <div class="scroll-indicator">
+                <span class="scroll-text">Scroll to explore</span>
+                <div class="scroll-arrow">
+                    <div class="scroll-dot"></div>
+                </div>
             </div>
-            <div class="hint" id="hint">Move your mouse — subtle parallax • Click to spawn a shooting star</div>
         </div>
+    </section>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <h2 class="fade-in-scroll">
+                About Festronix
+            </h2>
+            
+            <div class="about-grid">
+                <div class="about-card fade-in-scroll">
+                    <svg class="text-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <h3>Annual Event</h3>
+                    <p>A premier college festival celebrating innovation, creativity, and excellence across multiple domains.</p>
+                </div>
+                
+                <div class="about-card fade-in-scroll">
+                    <svg class="text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                        <path d="M4 22h16"></path>
+                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                    </svg>
+                    <h3>Competitions</h3>
+                    <p>Participate in exciting challenges spanning technology, arts, sports, and more with amazing prizes.</p>
+                </div>
+                
+                <div class="about-card fade-in-scroll">
+                    <svg class="text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+                        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+                        <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+                        <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+                    </svg>
+                    <h3>Innovation Hub</h3>
+                    <p>Connect with like-minded individuals, industry experts, and showcase your talents on a cosmic stage.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    // New Global variables for Constellation Drawing
-    let drawCanvas;
-    let drawCtx;
-    let constellationLines = [];
-    let currentLine = [];
-    let longPressTimer = null;
-    let isLongPress = false;
-    let DPR = Math.max(1, window.devicePixelRatio || 1); // Define globally for all functions
-    
-    // Updated Global Flag: isPressing replaces isMouseDown
-    let isPressing = false; 
-    let starfallIntervalId = null;
-    const STARFALL_FIRE_RATE = 20; // Controls the speed (50 stars per second)
+    <!-- Events Section -->
+    <section id="events">
+        <div class="container">
+            <h2 class="fade-in-scroll">Upcoming Events</h2>
+            <p class="section-subtitle fade-in-scroll">
+                Discover our spectacular lineup of events designed to inspire, challenge, and entertain
+            </p>
 
-    // NEW: Mode control variable.
-    let currentMode = 'constellation'; // 'constellation' or 'starfall' 
+            <div class="events-grid">
+                <div class="event-card fade-in-scroll">
+                    <img src="../src/assets/event-hackathon.jpg" alt="Tech Hackathon" class="event-image">
+                    <div class="event-content">
+                        <h3>Tech Hackathon 2024</h3>
+                        <p class="event-description">Join us for an intense 48-hour coding marathon where innovation meets creativity. Build groundbreaking solutions and compete for amazing prizes.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span>March 15-17, 2024</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span>Main Campus Auditorium</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span>200+ Participants</span>
+                            </div>
+                        </div>
+                        <button class="register-btn">Register Now</button>
+                    </div>
+                </div>
 
+                <div class="event-card fade-in-scroll">
+                    <img src="../src/assets/event-robotics.jpg" alt="Robotics Championship" class="event-image">
+                    <div class="event-content">
+                        <h3>Robotics Championship</h3>
+                        <p class="event-description">Showcase your robotics prowess in this thrilling competition. Design, build, and compete with autonomous robots in various challenging scenarios.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span>April 5-7, 2024</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span>Engineering Block</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span>50+ Teams</span>
+                            </div>
+                        </div>
+                        <button class="register-btn">Register Now</button>
+                    </div>
+                </div>
 
-    // --- CONSTELLATION DRAWING FUNCTIONS (Omitting for brevity, assume correct) ---
+                <div class="event-card fade-in-scroll">
+                    <img src="../src/assets/event-cultural.jpg" alt="Cosmic Cultural Fest" class="event-image">
+                    <div class="event-content">
+                        <h3>Cosmic Cultural Fest</h3>
+                        <p class="event-description">Experience a stellar celebration of art, music, and culture. Featuring performances, exhibitions, and competitions across multiple categories.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span>May 20-22, 2024</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span>Open Air Theatre</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span>1000+ Attendees</span>
+                            </div>
+                        </div>
+                        <button class="register-btn">Register Now</button>
+                    </div>
+                </div>
 
-    function drawCatmullRom(ctx, p0, p1, p2, p3, tension) {
-        const cp1x = p1.x + (p2.x - p0.x) * tension;
-        const cp1y = p1.y + (p2.y - p0.y) * tension;
-        const cp2x = p2.x - (p3.x - p1.x) * tension;
-        const cp2y = p2.y - (p3.y - p1.y) * tension;
-        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
-    }
+                <div class="event-card fade-in-scroll">
+                    <img src="../src/assets/event-sports.jpg" alt="Space Sports Extravaganza" class="event-image">
+                    <div class="event-content">
+                        <h3>Space Sports Extravaganza</h3>
+                        <p class="event-description">Compete in various sports events under a cosmic theme. From traditional sports to futuristic games, experience the ultimate athletic challenge.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span>June 10-12, 2024</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span>Sports Complex</span>
+                            </div>
+                            <div class="event-detail">
+                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span>500+ Athletes</span>
+                            </div>
+                        </div>
+                        <button class="register-btn">Register Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    function drawStar(point) {
-        drawCtx.fillStyle = 'white';
-        drawCtx.shadowBlur = 10;
-        drawCtx.shadowColor = 'white';
-        drawCtx.beginPath();
-        drawCtx.arc(point.x, point.y, 4 * DPR, 0, Math.PI * 2);
-        drawCtx.fill();
-        drawCtx.shadowBlur = 0;
-    }
+    <!-- Gallery Section -->
+    <section id="gallery">
+        <div class="container">
+            <h2 class="fade-in-scroll">Event Gallery</h2>
+            <p class="section-subtitle fade-in-scroll">
+                Glimpses from our previous cosmic celebrations
+            </p>
 
-    function redrawConstellations() {
-        if (!drawCtx || !drawCanvas) return;
-        drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            <div class="gallery-grid">
+                <div class="gallery-item fade-in-scroll">
+                    <img src="../src/assets/event-hackathon.jpg" alt="Gallery 1">
+                </div>
+                <div class="gallery-item fade-in-scroll">
+                    <img src="../src/assets/event-robotics.jpg" alt="Gallery 2">
+                </div>
+                <div class="gallery-item fade-in-scroll">
+                    <img src="../src/assets/event-cultural.jpg" alt="Gallery 3">
+                </div>
+                <div class="gallery-item fade-in-scroll">
+                    <img src="../src/assets/event-sports.jpg" alt="Gallery 4">
+                </div>
+                <div class="gallery-item fade-in-scroll">
+                    <img src="../src/assets/event-hackathon.jpg" alt="Gallery 5">
+                </div>
+                <div class="gallery-item fade-in-scroll">
+                    <img src="../src/assets/event-cultural.jpg" alt="Gallery 6">
+                </div>
+            </div>
+        </div>
+    </section>
 
-        for (const line of constellationLines) {
-            if (line.length === 0) continue;
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <h2 class="fade-in-scroll">Contact Us</h2>
+            <p class="section-subtitle fade-in-scroll">
+                Get in touch with us for any queries or registration assistance
+            </p>
 
-            const TENSION = 0.17;
+            <div class="contact-grid">
+                <div class="contact-card fade-in-scroll">
+                    <div class="contact-icon email">
+                        <svg fill="none" stroke="hsl(270, 80%, 60%)" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                        </svg>
+                    </div>
+                    <h3>Email</h3>
+                    <a href="mailto:info@festronix.edu">info@festronix.edu</a>
+                </div>
 
-            // --- 1. Draw all Stars ---
-            const dprPoints = [];
-            for (const star of line) {
-                const dprStar = { x: star.x * DPR, y: star.y * DPR };
-                drawStar(dprStar);
-                dprPoints.push(dprStar);
-            }
+                <div class="contact-card fade-in-scroll">
+                    <div class="contact-icon phone">
+                        <svg fill="none" stroke="hsl(320, 70%, 55%)" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </div>
+                    <h3>Phone</h3>
+                    <a href="tel:+1234567890">+1 (234) 567-890</a>
+                </div>
 
-            if (dprPoints.length < 2) continue;
+                <div class="contact-card fade-in-scroll">
+                    <div class="contact-icon location">
+                        <svg fill="none" stroke="hsl(180, 100%, 50%)" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </div>
+                    <h3>Location</h3>
+                    <p>123 Campus Drive<br>University City, ST 12345</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            // --- 2. Draw the Smooth Line Path ---
-            drawCtx.strokeStyle = 'rgba(255,255,255,0.8)';
-            drawCtx.lineWidth = 2 * DPR;
-            drawCtx.shadowBlur = 5;
-            drawCtx.shadowColor = 'white';
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2024 Festronix. All rights reserved. | Reach for the stars! 🚀</p>
+        </div>
+    </footer>
 
-            drawCtx.beginPath();
-            drawCtx.moveTo(dprPoints[0].x, dprPoints[0].y);
+    <script>
+        // Star Field Animation
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
 
-            for (let i = 1; i < dprPoints.length; i++) {
-                const p2 = line[i];
-                const p1 = line[i - 1];
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-                let p_before_p1, p_after_p2;
-
-                if (line.length === 2) {
-                    p_before_p1 = p1;
-                    p_after_p2 = p2;
-                } else {
-                    p_before_p1 = (i === 1) ? p1 : line[i - 2];
-                    p_after_p2 = (i === line.length - 1) ? p2 : line[i + 1];
-                }
-
-                const dpr_p_before_p1 = { x: p_before_p1.x * DPR, y: p_before_p1.y * DPR };
-                const dprP1 = { x: p1.x * DPR, y: p1.y * DPR };
-                const dprP2 = dprPoints[i];
-                const dpr_p_after_p2 = { x: p_after_p2.x * DPR, y: p_after_p2.y * DPR };
-
-                drawCatmullRom(drawCtx, dpr_p_before_p1, dprP1, dprP2, dpr_p_after_p2, TENSION);
-            }
-
-            drawCtx.stroke();
-            drawCtx.shadowBlur = 0;
+        const stars = [];
+        for (let i = 0; i < 200; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 0.5,
+                opacity: Math.random()
+            });
         }
-    }
 
-    function addStar(screenX, screenY, isNewLine = false) {
-        const newStar = { x: screenX, y: screenY };
-        const dprStar = { x: screenX * DPR, y: screenY * DPR };
+        function animateStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        drawStar(dprStar);
-
-        if (isNewLine || currentLine.length === 0) {
-            currentLine = [newStar];
-            constellationLines.push(currentLine);
-        } else {
-            currentLine.push(newStar);
-        }
-
-        redrawConstellations();
-    }
-
-    function clearConstellations() {
-        if (constellationLines.length === 0) return;
-        constellationLines = [];
-        currentLine = [];
-        if (drawCtx && drawCanvas) {
-            drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-        }
-        console.log("Constellations cleared.");
-    }
-
-    const clearButton = document.getElementById('clearConstellations');
-    clearButton.addEventListener('click', clearConstellations);
-
-    // --- END CONSTELLATION FUNCTIONS ---
-
-    // NEW: Mode Toggling Function
-    function handleModeToggle() {
-        const toggleButton = document.getElementById('modeToggle');
-        const hint = document.getElementById('hint');
-
-        if (currentMode === 'constellation') {
-            currentMode = 'starfall';
-            toggleButton.textContent = 'Current Mode: Starfall';
-            hint.innerHTML = 'Move mouse • **Click to spawn shooting stars** • Shift + Click still creates a new constellation line.';
-        } else {
-            currentMode = 'constellation';
-            toggleButton.textContent = 'Current Mode: Constellation';
-            hint.innerHTML = 'Move mouse • **Click to draw/connect stars** • Shift + Click to start a new line • Mobile: Long-press to start new line.';
-        }
-    }
-
-    const starsCanvas = document.getElementById('starsCanvas');
-    const ctx = starsCanvas.getContext('2d', { alpha: true });
-
-    // Initialize Constellation Canvas
-    drawCanvas = document.getElementById('drawCanvas');
-    drawCtx = drawCanvas.getContext('2d', { alpha: true });
-
-    let w = 0, h = 0, cx = 0, cy = 0;
-    DPR = Math.max(1, window.devicePixelRatio || 1);
-
-    // Configuration 
-    const STAR_COUNT = 600;
-    const STAR_MIN_R = 0.35;
-    const STAR_MAX_R = 1.6;
-    const TWINKLE_SPEED = 0.02;
-    const SHOOT_PROB = 0.006;
-    const SHOOT_MIN_SPEED = 8;
-    const SHOOT_MAX_SPEED = 14;
-    const nebulaContainer = document.querySelector('.nebula');
-    const PARALLAX_STAR_X = 18;
-    const PARALLAX_STAR_Y = 12;
-    const PARALLAX_NEBULA_X = -4;
-    const PARALLAX_NEBULA_Y = -3;
-
-    const stage = document.getElementById('stage');
-    let mouse = { x: 0, y: 0, px: 0, py: 0 };
-    let smoothMouse = { x: 0.5, y: 0.5 };
-    const SMOOTH_FACTOR = 0.08;
-
-    // Star and ShootingStar classes (omitted for brevity)
-    class Star {
-        constructor(x, y, r, alpha, tPhase) {
-            this.x = x;
-            this.y = y;
-            this.r = r;
-            this.baseAlpha = alpha;
-            this.t = tPhase;
-            this.twinkleSpeed = (Math.random() * 0.8 + 0.4) * TWINKLE_SPEED;
-            this.dx = (Math.random() - 0.5) * 0.02;
-            this.z = 0.3 + Math.random() * 0.7;
-            this.hue = Math.random() < 0.7 ? 210 + Math.random() * 40 : 0;
-        }
-    }
-    class ShootingStar {
-        constructor(x, y, vx, vy, life, length) {
-            this.x = x;
-            this.y = y;
-            this.vx = vx;
-            this.vy = vy;
-            this.life = life;
-            this.maxLife = life;
-            this.length = length;
-        }
-    }
-    let stars = [], shoots = [];
-    let starSprites = {};
-
-    function resize() {
-        DPR = Math.max(1, window.devicePixelRatio || 1);
-
-        w = starsCanvas.width = Math.round(stage.clientWidth * DPR);
-        h = starsCanvas.height = Math.round(stage.clientHeight * DPR);
-        starsCanvas.style.width = stage.clientWidth + 'px';
-        starsCanvas.style.height = stage.clientHeight + 'px';
-
-        drawCanvas.width = w;
-        drawCanvas.height = h;
-        drawCanvas.style.width = stage.clientWidth + 'px';
-        drawCanvas.style.height = stage.clientHeight + 'px';
-
-        cx = w / 2; cy = h / 2;
-
-        initStars();
-        redrawConstellations();
-    }
-
-    function initStars() {
-        stars = [];
-        const area = (w * h) / (1000 * 1000);
-        const count = Math.round(STAR_COUNT * area * 1.4);
-        for (let i = 0; i < count; i++) {
-            const x = Math.random() * w;
-            const y = Math.random() * h;
-            const r = STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R);
-            const baseAlpha = 0.45 + Math.random() * 0.6;
-            const tPhase = Math.random() * Math.PI * 2;
-            const rQuantized = Math.round((STAR_MIN_R + Math.random() * (STAR_MAX_R - STAR_MIN_R)) * 2) / 2;
-            stars.push(new Star(x, y, rQuantized, baseAlpha, tPhase));
-        }
-    }
-    function generateStarSprites(minR, maxR, count) {
-        const sprites = {};
-        for (let r = minR; r <= maxR; r += 0.5) {
-            const key = r.toFixed(1);
-            const size = r * 2 * DPR + 4;
-            const spriteCanvas = document.createElement('canvas');
-            spriteCanvas.width = spriteCanvas.height = size;
-            const sctx = spriteCanvas.getContext('2d');
-            const centerX = size / 2;
-
-            sctx.beginPath();
-            sctx.fillStyle = 'rgba(255, 255, 255, 1)';
-            sctx.arc(centerX, centerX, r * DPR, 0, Math.PI * 2);
-            sctx.fill();
-
-            sprites[key] = spriteCanvas;
-        }
-        return sprites;
-    }
-
-    function continuousStarfallLoop() {
-        // Use the generic isPressing flag
-        if (!isPressing || currentMode !== 'starfall') return;
-
-        // Use the raw global mouse position (mouse.x, mouse.y) for immediate response
-        const px = mouse.x;
-        const py = mouse.y;
-
-        spawnShootingStar({ x: px, y: py });
-        // Spawn a second star only occasionally to prevent overpowering the effect
-        if (Math.random() < 0.4) {
-            spawnShootingStar({ x: px, y: py });
-        }
-    }
-
-    function spawnShootingStar(manualPos) {
-        const SHOOT_MIN_SPEED = 8;
-        const SHOOT_MAX_SPEED = 14;
-        const w = drawCanvas.width;
-        const h = drawCanvas.height;
-        const cx = w / 2;
-        const cy = h / 2;
-
-        let x, y, speed, angleToCenter, angleOffset;
-
-        if (manualPos) {
-            // --- MANUAL SPAWN LOGIC (Click/Tap) ---
-            x = manualPos.x * w;
-            y = manualPos.y * h;
-
-            angleToCenter = Math.atan2(y - cy, x - cx);
-            angleOffset = (Math.random() - 0.5) * 0.8;
-            const ang = angleToCenter + angleOffset;
-
-            speed = SHOOT_MAX_SPEED * 1.5 + Math.random() * 5;
-            const vx = Math.cos(ang) * speed;
-            const vy = Math.sin(ang) * speed;
-
-            const life = Math.round(50 + Math.random() * 40);
-            const length = 150 + Math.random() * 150;
-
-            shoots.push(new ShootingStar(x, y, vx, vy, life, length));
-            return;
-
-        } else {
-            // --- AUTOMATIC SPAWN LOGIC ---
-            const startFrom = Math.random();
-
-            // 1. Determine starting edge 
-            if (startFrom < 0.5) { // Left or Top Edge
-                if (Math.random() < 0.6) { // Left-side start
-                    x = -10 - Math.random() * w * 0.1;
-                    y = Math.random() * h * 0.4;
-                } else { // Top-side start
-                    x = Math.random() * w * 0.4;
-                    y = -10 - Math.random() * h * 0.1;
-                }
-            } else { // Right or Bottom Edge
-                if (Math.random() < 0.6) { // Right-side start
-                    x = w + 10 + Math.random() * w * 0.1;
-                    y = Math.random() * h * 0.4;
-                } else { // Bottom-side start
-                    x = Math.random() * w * 0.4;
-                    y = h + 10 + Math.random() * h * 0.1;
-                }
-            }
-
-            // 2. Calculate Angle: Aim towards the center, but add a substantial random spread
-            angleToCenter = Math.atan2(cy - y, cx - x);
-            angleOffset = (Math.random() - 0.5) * 0.8;
-            const ang = angleToCenter + angleOffset;
-
-            // 3. Set Speed and Create Star
-            speed = SHOOT_MIN_SPEED + Math.random() * (SHOOT_MAX_SPEED - SHOOT_MIN_SPEED);
-            const vx = Math.cos(ang) * speed;
-            const vy = Math.sin(ang) * speed;
-
-            const life = Math.round(30 + Math.random() * 45);
-            const length = 90 + Math.random() * 140;
-
-            shoots.push(new ShootingStar(x, y, vx, vy, life, length));
-        }
-    }
-
-    let lastTs = 0;
-    function animate(ts) {
-        const dt = Math.min(60, ts - lastTs);
-        lastTs = ts;
-        ctx.clearRect(0, 0, w, h);
-
-        const dtFactor = dt / 16;
-        smoothMouse.x += (mouse.x - smoothMouse.x) * SMOOTH_FACTOR * dtFactor;
-        smoothMouse.y += (mouse.y - smoothMouse.y) * SMOOTH_FACTOR * dtFactor;
-        const parx = (smoothMouse.x - 0.5) * PARALLAX_STAR_X * DPR;
-        const pary = (smoothMouse.y - 0.5) * PARALLAX_STAR_Y * DPR;
-        const nebulaParallaxX = (smoothMouse.x - 0.5) * PARALLAX_NEBULA_X;
-        const nebulaParallaxY = (smoothMouse.y - 0.5) * PARALLAX_NEBULA_Y;
-        nebulaContainer.style.transform = `translate(${nebulaParallaxX}px, ${nebulaParallaxY}px)`;
-
-        // Star drawing loop
-        for (let i = 0; i < stars.length; i++) {
-            const s = stars[i];
-            s.t += s.twinkleSpeed * (dt / 16);
-            const tw = (Math.sin(s.t) + 1) / 2;
-            const alpha = Math.max(0.05, Math.min(1, s.baseAlpha * (0.6 + 0.6 * tw)));
-            const parallaxFactor = 1.0 - s.z;
-            const x = Math.round(s.x + parx * parallaxFactor * 0.5);
-            const y = Math.round(s.y + pary * parallaxFactor * 0.5);
-
-            if (s.r > 1.2) {
-                const g = ctx.createRadialGradient(x, y, 0, x, y, s.r * 9 * DPR);
-                g.addColorStop(0, `rgba(180,220,255,${(alpha * 0.22).toFixed(3)})`);
-                g.addColorStop(0.4, `rgba(120,200,255,${(alpha * 0.09).toFixed(3)})`);
-                g.addColorStop(1, 'rgba(0,0,0,0)');
-                ctx.fillStyle = g;
+            stars.forEach(star => {
                 ctx.beginPath();
-                ctx.arc(x, y, s.r * 9 * DPR, 0, Math.PI * 2);
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
                 ctx.fill();
-            }
-            ctx.beginPath();
-            let starColor;
-            if (s.hue === 0) {
-                starColor = `rgba(255,255,255,${alpha.toFixed(3)})`;
-            } else {
-                const lightness = 80 + s.r * 10;
-                starColor = `hsla(${s.hue}, 100%. ${lightness}%, ${alpha.toFixed(3)})`;
-            }
-            ctx.fillStyle = starColor;
-            ctx.arc(x, y, s.r * DPR, 0, Math.PI * 2);
-            ctx.fill();
 
-            s.x += s.dx * (dt / 16);
-            if (s.x < -20) s.x = w + 20;
-            if (s.x > w + 20) s.x = -20;
-            if (s.y < -20) s.y = h + 20;
-            if (s.y > h + 20) s.y = -20;
+                // Twinkling effect
+                star.opacity += (Math.random() - 0.5) * 0.02;
+                star.opacity = Math.max(0.1, Math.min(1, star.opacity));
+
+                // Movement
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+
+            requestAnimationFrame(animateStars);
         }
 
-        // Shooting star loop 
-        for (let i = shoots.length - 1; i >= 0; i--) {
-            const sh = shoots[i];
-            const f = sh.life / sh.maxLife;
-            const tx = sh.x - sh.vx * (sh.length / 80);
-            const ty = sh.y - sh.vy * (sh.length / 80);
+        animateStars();
 
-            // --- TAPERED TAIL DRAWING ---
-            const g = ctx.createLinearGradient(sh.x, sh.y, tx, ty);
-            g.addColorStop(0, `rgba(255,255,255,${(0.98 * f).toFixed(3)})`);
-            g.addColorStop(0.2, `rgba(180,220,255,${(0.5 * f).toFixed(3)})`);
-            g.addColorStop(0.6, `rgba(100,150,255,${(0.15 * f).toFixed(3)})`);
-            g.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.strokeStyle = g;
-            ctx.lineWidth = 1.8 * DPR;
-            ctx.beginPath();
-            ctx.moveTo(sh.x, sh.y);
-            ctx.lineTo(tx, ty);
-            ctx.stroke();
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
 
-            // --- DYNAMIC HEAD DRAWING ---
-            const pulse = (Math.sin(sh.life * 0.4) * 0.2) + 1;
-            const headRadius = 2.6 * DPR * Math.min(1.3, f * 1.6) * pulse;
-            ctx.beginPath();
-            ctx.fillStyle = `rgba(255,255,255,${(0.98 * f).toFixed(3)})`;
-            ctx.arc(sh.x, sh.y, headRadius, 0, Math.PI * 2);
-            ctx.fill();
+        // Scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
 
-            sh.x += sh.vx * (dt / 16);
-            sh.y += sh.vy * (dt / 16);
-            sh.life -= (dt / 16);
-
-            if (sh.life <= 0 || sh.x < -200 || sh.x > w + 200 || sh.y < -200 || sh.y > h + 200) {
-                shoots.splice(i, 1);
-            }
-        }
-        if (Math.random() < SHOOT_PROB) spawnShootingStar();
-        requestAnimationFrame(animate);
-    }
-
-    // Mouse handling for parallax
-    function onMouseMove(e) {
-        const rect = starsCanvas.getBoundingClientRect();
-        mouse.x = ((e.clientX - rect.left) / rect.width) || 0.5;
-        mouse.y = ((e.clientY - rect.top) / rect.height) || 0.5;
-    }
-    function onTouchMove(e) {
-        if (!e.touches || e.touches.length === 0) return;
-        const t = e.touches[0];
-        onMouseMove({ clientX: t.clientX, clientY: t.clientY });
-    }
-    starsCanvas.addEventListener('mousemove', onMouseMove);
-    starsCanvas.addEventListener('touchmove', onTouchMove, { passive: true });
-
-
-    // Function to handle continuous updating when the mouse or touch is pressing
-    function onMouseHoldMove(e) {
-        // Use isPressing
-        if (!isPressing) return;
-
-        // Use the coordinates from the active event
-        const rect = starsCanvas.getBoundingClientRect();
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
-        
-        const normalizedX = ((clientX - rect.left) / rect.width) || 0.5;
-        const normalizedY = ((clientY - rect.top) / rect.height) || 0.5;
-
-        // Update the raw global mouse object instantly
-        mouse.x = normalizedX;
-        mouse.y = normalizedY;
-    }
-
-    // --- UPDATED MOUSE EVENT HANDLERS FOR drawCanvas (using isPressing) ---
-
-    // 1. MOUSE DOWN: Start the loop AND start listening for movement
-    drawCanvas.addEventListener('mousedown', (e) => {
-        if (currentMode !== 'starfall' || e.shiftKey) return;
-
-        isPressing = true; // Use isPressing
-
-        // Attach the dedicated continuous move tracker to the document body
-        document.body.addEventListener('mousemove', onMouseHoldMove);
-
-        // Crucial: Set the initial position immediately
-        onMouseHoldMove(e);
-
-        // Start the interval loop
-        starfallIntervalId = setInterval(continuousStarfallLoop, STARFALL_FIRE_RATE);
-    });
-
-    // 2. MOUSE UP: Stop the loop AND stop listening for movement
-    document.body.addEventListener('mouseup', () => {
-        if (!isPressing) return; // Only run if we were actually holding the button down
-
-        isPressing = false; // Use isPressing
-        document.body.removeEventListener('mousemove', onMouseHoldMove);
-        if (starfallIntervalId) {
-            clearInterval(starfallIntervalId);
-            starfallIntervalId = null;
-        }
-    });
-
-    // 3. MOUSE LEAVE (Safety stop for drawCanvas area)
-    drawCanvas.addEventListener('mouseleave', () => {
-        if (isPressing && currentMode === 'starfall') { // Use isPressing
-             isPressing = false; // Use isPressing
-             document.body.removeEventListener('mousemove', onMouseHoldMove);
-             if (starfallIntervalId) {
-                 clearInterval(starfallIntervalId);
-                 starfallIntervalId = null;
-             }
-        }
-    });
-
-    // 4. CONSTELLATION MODE CLICKS: Handles single clicks for constellation drawing
-    drawCanvas.addEventListener('click', (e) => {
-        if (e.pointerType !== "mouse") return;
-        
-        // Prevents a click event from firing after a mousedown/mouseup sequence
-        if (currentMode === 'starfall' && !e.shiftKey) return; 
-
-        const rect = drawCanvas.getBoundingClientRect();
-        const clientX = e.clientX - rect.left;
-        const clientY = e.clientY - rect.top;
-
-        if (e.shiftKey || currentMode === 'constellation') {
-            addStar(clientX, clientY, e.shiftKey);
-        }
-    });
-
-    // --- NEW TOUCH EVENT HANDLERS FOR drawCanvas (Touch-and-Drag Starfall) ---
-    
-    // 1. TOUCH START: Start the Starfall loop or the Constellation long-press timer
-    drawCanvas.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Prevent default mobile scrolling/zoom behavior
-        const touch = e.touches[0];
-        
-        if (currentMode === 'starfall') {
-            isPressing = true;
-            
-            // Attach onMouseHoldMove to the body to track movement during press
-            document.body.addEventListener('touchmove', onMouseHoldMove);
-            
-            // Crucial: Set the initial position immediately using the touch coordinates
-            onMouseHoldMove(e);
-            
-            // Start the continuous starfall loop
-            starfallIntervalId = setInterval(continuousStarfallLoop, STARFALL_FIRE_RATE);
-            
-        } else if (currentMode === 'constellation') {
-            // Constellation long-press logic
-            isLongPress = false;
-            longPressTimer = setTimeout(() => {
-                isLongPress = true;
-            }, 500);
-        }
-    }, { passive: false });
-
-
-    // 2. TOUCH END: Stops the Starfall loop OR handles Constellation tap/long-press
-    document.body.addEventListener('touchend', (e) => {
-        
-        // Clean up Starfall if it was running
-        if (isPressing) {
-            isPressing = false;
-            document.body.removeEventListener('touchmove', onMouseHoldMove);
-            if (starfallIntervalId) {
-                clearInterval(starfallIntervalId);
-                starfallIntervalId = null;
-            }
-        }
-        
-        // Clean up Constellation long-press timer
-        clearTimeout(longPressTimer);
-        
-        // Handle single tap for Constellation Mode only
-        if (currentMode === 'constellation') {
-            const touch = e.changedTouches[0];
-            const rect = drawCanvas.getBoundingClientRect();
-            const clientX = touch.clientX - rect.left;
-            const clientY = touch.clientY - rect.top;
-
-            const isNewLine = isLongPress;
-            // Only add a star if the touch didn't move much (to filter out a drag)
-            if (!isPressing) { // If isPressing is false, it means it was a tap/short press
-                addStar(clientX, clientY, isNewLine);
-            }
-        } 
-    });
-    // --- END TOUCH EVENT HANDLERS ---
-
-    // keyboard toggles: press 's' to spawn a burst
-    window.addEventListener('keydown', (e) => {
-        if (e.key.toLowerCase() === 's') {
-            spawnShootingStar();
-            spawnShootingStar();
-        }
-    });
-
-    // init
-    function start() {
-        resize();
-        lastTs = performance.now();
-        requestAnimationFrame(animate);
-    }
-
-    window.addEventListener('resize', () => {
-        clearTimeout(window._rsz);
-        window._rsz = setTimeout(resize, 120);
-    });
-
-    // --- BUTTON FIX: Get element and attach listener here ---
-    const toggleButton = document.getElementById('modeToggle');
-    toggleButton.addEventListener('click', handleModeToggle);
-    
-    start();
-});
-        </script>
+        document.querySelectorAll('.fade-in-scroll').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
 </body>
-
 </html>
