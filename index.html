@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Festronix - College Events Registration</title>
-    <meta name="description" content="Experience stellar college events at Festronix. Register for hackathons, robotics competitions, cultural fests, and sports events. Where innovation meets the cosmos!">
+    <title>3D Satellite Showcase | Interactive 3D Experience</title>
+    <meta name="description" content="Experience the future of web design with an interactive 3D satellite model and optimized WebGL graphics">
+    <meta name="keywords" content="3D satellite, interactive 3D, WebGL, Three.js, 3D showcase, space">
+    
     <style>
         * {
             margin: 0;
@@ -13,899 +15,891 @@
         }
 
         :root {
-            --bg-primary: hsl(240, 50%, 5%);
-            --text-primary: hsl(240, 10%, 95%);
-            --text-muted: hsl(240, 10%, 60%);
-            --primary: hsl(270, 80%, 60%);
-            --secondary: hsl(320, 70%, 55%);
+            --background: hsl(240, 10%, 3.9%);
+            --foreground: hsl(0, 0%, 98%);
+            --primary: hsl(210, 100%, 50%);
+            --primary-glow: hsl(210, 100%, 65%);
+            --secondary: hsl(270, 60%, 60%);
             --accent: hsl(180, 100%, 50%);
-            --card-bg: hsl(250, 40%, 10%);
-            --border: hsl(250, 30%, 20%);
+            --muted: hsl(240, 5%, 15%);
+            --muted-foreground: hsl(240, 5%, 65%);
+            --border: hsl(240, 5%, 15%);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* Star Field Canvas */
-        #starfield {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Hero Section */
-        .hero {
-            position: relative;
+            background: linear-gradient(180deg, hsl(240, 10%, 3.9%), hsl(240, 15%, 8%));
+            color: var(--foreground);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to bottom, rgba(12, 10, 28, 0.5), rgba(12, 10, 28, 0.3), rgba(12, 10, 28, 1));
-        }
-
-        .hero .content {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            padding: 2rem;
-            max-width: 1200px;
-        }
-
-        .hero .logo-main {
-            font-size: clamp(3rem, 8vw, 8rem);
-            font-weight: 700;
-            max-width: 700px;
-            width: 100%;
-            margin: 0 auto 2rem;
-            background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-            -webkit-background-clip: text;
-            background-clip: text;
-            margin-bottom: 1rem;
-            animation: float 6s ease-in-out infinite, glow-pulse 3s ease-in-out infinite, fade-in-up 0.8s ease-out;
-        }
-
-        .hero h2 {
-            font-size: 2rem;
-            font-weight: 300;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            letter-spacing: 2px;
-            animation: fade-in-up 0.8s ease-out;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            max-width: 800px;
-            margin: 0 auto 3rem;
-            line-height: 1.8;
-            animation: fade-in-up 0.8s ease-out 0.2s backwards;
-        }
-
-        .scroll-indicator {
-            position: relative;
-            top: 2rem;
-            bottom: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0;
-            animation: fade-in-up 1.2s ease-out 0.2s both;
-        }
-
-        .scroll-text {
-            font-size: 1.25rem;
-            color: hsl(210, 40%, 60%);
-            margin-bottom: 1rem;
-        }
-
-        .scroll-arrow {
-            width: 2rem;
-            height: 3.5rem;
-            border: 2px solid hsl(260, 100%, 65%, 0.5);
-            border-radius: 1rem;
-            display: flex;
-            justify-content: center;
-        }
-
-        .scroll-dot {
-            width: 0.3rem;
-            height: 1rem;
-            background: hsl(260, 100%, 65%);
-            border-radius: 0.25rem;
-            margin-top: 0.75rem;
-            animation: bounce 2s infinite;
-        }
-
-
-        /* Section Styles */
-        section {
-            position: relative;
-            padding: 6rem 2rem;
+            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
             max-width: 1280px;
             margin: 0 auto;
+            padding: 3rem 1rem;
         }
 
-        h2 {
-            font-size: 2.5rem;
+        /* Hero Section */
+        .hero {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease-out;
         }
 
-        .section-subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            margin-bottom: 4rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* About Section */
-        .about-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .about-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .about-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
-            transform: translateY(-5px);
-        }
-
-        .about-card svg {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 1rem;
-        }
-
-        .about-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .about-card p {
-            color: var(--text-muted);
-        }
-
-        /* Events Section */
-        .events-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 2rem;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .event-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.5s;
-            position: relative;
-        }
-
-        .event-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), transparent, rgba(236, 72, 153, 0.2));
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .event-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-        }
-
-        .event-card:hover::before {
-            opacity: 1;
-        }
-
-        .event-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            transition: transform 0.7s;
-        }
-
-        .event-card:hover .event-image {
-            transform: scale(1.1);
-        }
-
-        .event-content {
-            padding: 1.5rem;
-        }
-
-        .event-content h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            transition: color 0.3s;
-        }
-
-        .event-card:hover h3 {
-            color: var(--primary);
-        }
-
-        .event-description {
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .event-details {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .event-detail {
-            display: flex;
+        .badge {
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            background: hsl(240, 10%, 10%, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid hsl(240, 5%, 20%, 0.3);
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            margin-bottom: 1.5rem;
         }
 
-        .event-detail svg {
-            width: 16px;
-            height: 16px;
+        .badge-icon {
             color: var(--accent);
         }
 
-        .register-btn {
-            width: 100%;
-            padding: 0.8rem;
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--muted-foreground);
+            max-width: 42rem;
+            margin: 0 auto 2rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
             background: var(--primary);
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
+            box-shadow: 0 0 40px hsl(210, 100%, 50%, 0.3);
         }
 
-        .register-btn:hover {
-            background: hsl(270, 80%, 55%);
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px hsl(210, 100%, 50%, 0.5);
         }
 
-        /* Gallery Section */
-        .gallery-grid {
+        .btn-outline {
+            background: hsl(240, 10%, 10%, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid hsl(210, 100%, 50%, 0.2);
+            color: var(--foreground);
+        }
+
+        .btn-outline:hover {
+            background: hsl(210, 100%, 50%, 0.1);
+        }
+
+        /* Grid Layout */
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (min-width: 1024px) {
+            .grid {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            margin-top: 4rem;
+            animation: fadeIn 0.6s ease-out 0.4s backwards;
         }
 
-        .gallery-item {
-            aspect-ratio: 16/9;
-            border-radius: 16px;
+        /* 3D Canvas */
+        .canvas-container {
+            height: 500px;
+            border-radius: 1rem;
             overflow: hidden;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.5s;
-            position: relative;
+            background: hsl(240, 10%, 10%, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid hsl(240, 5%, 20%, 0.3);
+            box-shadow: 0 0 40px hsl(210, 100%, 50%, 0.3);
+            animation: fadeIn 0.6s ease-out;
         }
 
-        .gallery-item img {
+        @media (min-width: 1024px) {
+            .canvas-container {
+                height: 600px;
+            }
+        }
+
+        #canvas3d {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.7s;
+            display: block;
         }
 
-        .gallery-item:hover {
-            border-color: var(--primary);
+        /* Control Panel */
+        .control-panel {
+            background: hsl(240, 10%, 10%, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid hsl(240, 5%, 20%, 0.3);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            animation: fadeIn 0.6s ease-out 0.2s backwards;
         }
 
-        .gallery-item:hover img {
-            transform: scale(1.1);
+        .control-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .gallery-item::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(167, 139, 250, 0.5), transparent);
-            opacity: 0;
-            transition: opacity 0.5s;
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
         }
 
-        .gallery-item:hover::after {
-            opacity: 1;
-        }
-
-        /* Contact Section */
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .contact-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.3s;
-        }
-
-        .contact-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
-            transform: translateY(-5px);
-        }
-
-        .contact-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
+        .control-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
+            flex-shrink: 0;
         }
 
-        .contact-icon.email {
-            background: rgba(167, 139, 250, 0.2);
+        .control-icon.primary { background: hsl(210, 100%, 50%, 0.1); color: var(--primary); }
+        .control-icon.accent { background: hsl(180, 100%, 50%, 0.1); color: var(--accent); }
+        .control-icon.secondary { background: hsl(270, 60%, 60%, 0.1); color: var(--secondary); }
+
+        .control-text h4 {
+            font-weight: 500;
+            margin-bottom: 0.125rem;
         }
 
-        .contact-icon.phone {
-            background: rgba(236, 72, 153, 0.2);
+        .control-text p {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
         }
 
-        .contact-icon.location {
-            background: rgba(6, 182, 212, 0.2);
+        .control-footer {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
         }
 
-        .contact-icon svg {
-            width: 32px;
-            height: 32px;
+        /* Feature Cards */
+        .card {
+            background: hsl(240, 10%, 10%, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid hsl(240, 5%, 20%, 0.3);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
         }
 
-        .contact-card h3 {
-            font-size: 1.3rem;
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon.gradient-1 {
+            background: linear-gradient(135deg, var(--primary), var(--primary-glow));
+            box-shadow: 0 0 40px hsl(210, 100%, 50%, 0.3);
+        }
+
+        .card-icon.gradient-2 {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            box-shadow: 0 0 40px hsl(180, 100%, 50%, 0.4);
+        }
+
+        .card-icon.gradient-3 {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            box-shadow: 0 0 40px hsl(210, 100%, 50%, 0.3);
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
-        .contact-card a {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s;
+        .card p {
+            color: var(--muted-foreground);
         }
 
-        .contact-card a:hover {
-            color: var(--primary);
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--muted-foreground);
         }
 
-        /* Footer */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 2rem;
-            text-align: center;
-            color: var(--text-muted);
+        .spinner {
+            width: 4rem;
+            height: 4rem;
+            border: 4px solid var(--muted);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
         }
 
         /* Animations */
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
-        @keyframes slide-up {
-            0% { transform: translateY(100px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes cosmicPulse {
-            0%, 100% {
-                filter: drop-shadow(0 0 20px hsla(var(--primary), 0.3));
-            }
-            50% {
-                filter: drop-shadow(0 0 40px hsla(var(--primary), 0.6)) drop-shadow(0 0 60px hsla(var(--primary), 0.3));
-            }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-
-        @keyframes glow-pulse {
-            0%, 100% { 
-                opacity: 1; 
-                filter: drop-shadow(0 0 10px hsl(270, 80%, 60%));
-            }
-            50% { 
-                opacity: 0.8; 
-                filter: drop-shadow(0 0 30px hsl(270, 80%, 60%));
-            }
-        }
-
-        @keyframes fade-in-up {
-            0% {
+        @keyframes fadeIn {
+            from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
-            100% {
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        @keyframes scale-in {
-            0% {
-                opacity: 0;
-                transform: scale(0.9);
+        @keyframes glowPulse {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px hsl(210, 100%, 50%, 0.3));
             }
-            100% {
-                opacity: 1;
-                transform: scale(1);
+            50% {
+                filter: drop-shadow(0 0 40px hsl(210, 100%, 50%, 0.6)) drop-shadow(0 0 60px hsl(180, 100%, 50%, 0.4));
             }
         }
 
-        .fade-in-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .fade-in-scroll.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-
-            .hero h2 {
-                font-size: 1.5rem;
-            }
-
-            .hero p {
-                font-size: 1rem;
-            }
-
-            h2 {
-                font-size: 2rem;
-            }
-
-            .events-grid,
-            .gallery-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .hero .logo-main {
-                max-width: 500px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            section {
-                padding: 4rem 1rem;
-            }
-
-            .hero .logo-main {
-                max-width: 350px;
-            }
-
+        /* Icons */
+        .icon {
+            width: 1.5rem;
+            height: 1.5rem;
         }
     </style>
 </head>
 <body>
-    <!-- Star Field Canvas -->
-    <canvas id="starfield"></canvas>
-
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="content">
-            <h1 class="logo-main">FESTRONIX</h1>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="badge">
+                <svg class="icon badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+                <span>Interactive 3D Satellite Experience</span>
+            </div>
             
-            <h2>Where Innovation Meets the Cosmos</h2>
+            <h1>3D Satellite Showcase</h1>
             
-            <p>
-                Embark on an extraordinary journey through our stellar lineup of events. 
-                From cutting-edge technology to vibrant cultural celebrations, 
-                Festronix brings together the brightest minds for an unforgettable experience.
+            <p class="subtitle">
+                Experience the future of web design with an interactive 3D satellite model. 
+                Interact with the satellite using your mouse or touch gestures.
             </p>
             
-            <div class="scroll-indicator">
-                <span class="scroll-text">Scroll to explore</span>
-                <div class="scroll-arrow">
-                    <div class="scroll-dot"></div>
-                </div>
+            <div class="button-group">
+                <button class="btn btn-primary">
+                    Get Started
+                </button>
+                <a href="https://github.com" class="btn btn-outline">
+                    <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    View Code
+                </a>
             </div>
         </div>
-    </section>
 
-    <!-- About Section -->
-    <section id="about">
-        <div class="container">
-            <h2 class="fade-in-scroll">
-                About Festronix
-            </h2>
+        <!-- Main Grid -->
+        <div class="grid">
+            <!-- 3D Canvas -->
+            <div class="canvas-container">
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading 3D Satellite...</p>
+                </div>
+                <canvas id="canvas3d"></canvas>
+            </div>
             
-            <div class="about-grid">
-                <div class="about-card fade-in-scroll">
-                    <svg class="text-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    <h3>Annual Event</h3>
-                    <p>A premier college festival celebrating innovation, creativity, and excellence across multiple domains.</p>
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <h3 class="control-title">Controls</h3>
+                
+                <div class="control-item">
+                    <div class="control-icon primary">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                        </svg>
+                    </div>
+                    <div class="control-text">
+                        <h4>Rotate</h4>
+                        <p>Click & drag to rotate</p>
+                    </div>
                 </div>
                 
-                <div class="about-card fade-in-scroll">
-                    <svg class="text-secondary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                        <path d="M4 22h16"></path>
-                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-                    </svg>
-                    <h3>Competitions</h3>
-                    <p>Participate in exciting challenges spanning technology, arts, sports, and more with amazing prizes.</p>
+                <div class="control-item">
+                    <div class="control-icon accent">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                        </svg>
+                    </div>
+                    <div class="control-text">
+                        <h4>Zoom</h4>
+                        <p>Scroll to zoom in/out</p>
+                    </div>
                 </div>
                 
-                <div class="about-card fade-in-scroll">
-                    <svg class="text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
-                        <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
-                        <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
-                        <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+                <div class="control-item">
+                    <div class="control-icon secondary">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </div>
+                    <div class="control-text">
+                        <h4>Auto-Rotate</h4>
+                        <p>Enabled by default</p>
+                    </div>
+                </div>
+                
+                <div class="control-footer">
+                    Interactive 3D satellite model with optimized rendering using WebGL
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-icon gradient-1">
+                    <svg class="icon" fill="none" stroke="white" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    <h3>Innovation Hub</h3>
-                    <p>Connect with like-minded individuals, industry experts, and showcase your talents on a cosmic stage.</p>
                 </div>
+                <h3>Optimized Performance</h3>
+                <p>Hardware-accelerated WebGL rendering with adaptive quality for smooth 60fps on all devices.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon gradient-2">
+                    <svg class="icon" fill="none" stroke="white" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                </div>
+                <h3>Fully Interactive</h3>
+                <p>Intuitive controls with mouse, touch, and keyboard support. Rotate, zoom, and explore the satellite freely.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon gradient-3">
+                    <svg class="icon" fill="none" stroke="white" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <h3>Modern Tech</h3>
+                <p>Built with Three.js for cutting-edge 3D web experiences using pure WebGL technology.</p>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Events Section -->
-    <section id="events">
-        <div class="container">
-            <h2 class="fade-in-scroll">Upcoming Events</h2>
-            <p class="section-subtitle fade-in-scroll">
-                Discover our spectacular lineup of events designed to inspire, challenge, and entertain
-            </p>
-
-            <div class="events-grid">
-                <div class="event-card fade-in-scroll">
-                    <img src="../src/assets/event-hackathon.jpg" alt="Tech Hackathon" class="event-image">
-                    <div class="event-content">
-                        <h3>Tech Hackathon 2024</h3>
-                        <p class="event-description">Join us for an intense 48-hour coding marathon where innovation meets creativity. Build groundbreaking solutions and compete for amazing prizes.</p>
-                        <div class="event-details">
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <span>March 15-17, 2024</span>
-                            </div>
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                <span>Main Campus Auditorium</span>
-                            </div>
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                                <span>200+ Participants</span>
-                            </div>
-                        </div>
-                        <button class="register-btn">Register Now</button>
-                    </div>
-                </div>
-
-                <div class="event-card fade-in-scroll">
-                    <img src="../src/assets/event-robotics.jpg" alt="Robotics Championship" class="event-image">
-                    <div class="event-content">
-                        <h3>Robotics Championship</h3>
-                        <p class="event-description">Showcase your robotics prowess in this thrilling competition. Design, build, and compete with autonomous robots in various challenging scenarios.</p>
-                        <div class="event-details">
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <span>April 5-7, 2024</span>
-                            </div>
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                <span>Engineering Block</span>
-                            </div>
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                                <span>50+ Teams</span>
-                            </div>
-                        </div>
-                        <button class="register-btn">Register Now</button>
-                    </div>
-                </div>
-
-                <div class="event-card fade-in-scroll">
-                    <img src="../src/assets/event-cultural.jpg" alt="Cosmic Cultural Fest" class="event-image">
-                    <div class="event-content">
-                        <h3>Cosmic Cultural Fest</h3>
-                        <p class="event-description">Experience a stellar celebration of art, music, and culture. Featuring performances, exhibitions, and competitions across multiple categories.</p>
-                        <div class="event-details">
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <span>May 20-22, 2024</span>
-                            </div>
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                <span>Open Air Theatre</span>
-                            </div>
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                                <span>1000+ Attendees</span>
-                            </div>
-                        </div>
-                        <button class="register-btn">Register Now</button>
-                    </div>
-                </div>
-
-                <div class="event-card fade-in-scroll">
-                    <img src="../src/assets/event-sports.jpg" alt="Space Sports Extravaganza" class="event-image">
-                    <div class="event-content">
-                        <h3>Space Sports Extravaganza</h3>
-                        <p class="event-description">Compete in various sports events under a cosmic theme. From traditional sports to futuristic games, experience the ultimate athletic challenge.</p>
-                        <div class="event-details">
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
-                                <span>June 10-12, 2024</span>
-                            </div>
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                <span>Sports Complex</span>
-                            </div>
-                            <div class="event-detail">
-                                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                                <span>500+ Athletes</span>
-                            </div>
-                        </div>
-                        <button class="register-btn">Register Now</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Gallery Section -->
-    <section id="gallery">
-        <div class="container">
-            <h2 class="fade-in-scroll">Event Gallery</h2>
-            <p class="section-subtitle fade-in-scroll">
-                Glimpses from our previous cosmic celebrations
-            </p>
-
-            <div class="gallery-grid">
-                <div class="gallery-item fade-in-scroll">
-                    <img src="../src/assets/event-hackathon.jpg" alt="Gallery 1">
-                </div>
-                <div class="gallery-item fade-in-scroll">
-                    <img src="../src/assets/event-robotics.jpg" alt="Gallery 2">
-                </div>
-                <div class="gallery-item fade-in-scroll">
-                    <img src="../src/assets/event-cultural.jpg" alt="Gallery 3">
-                </div>
-                <div class="gallery-item fade-in-scroll">
-                    <img src="../src/assets/event-sports.jpg" alt="Gallery 4">
-                </div>
-                <div class="gallery-item fade-in-scroll">
-                    <img src="../src/assets/event-hackathon.jpg" alt="Gallery 5">
-                </div>
-                <div class="gallery-item fade-in-scroll">
-                    <img src="../src/assets/event-cultural.jpg" alt="Gallery 6">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact">
-        <div class="container">
-            <h2 class="fade-in-scroll">Contact Us</h2>
-            <p class="section-subtitle fade-in-scroll">
-                Get in touch with us for any queries or registration assistance
-            </p>
-
-            <div class="contact-grid">
-                <div class="contact-card fade-in-scroll">
-                    <div class="contact-icon email">
-                        <svg fill="none" stroke="hsl(270, 80%, 60%)" stroke-width="2" viewBox="0 0 24 24">
-                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                        </svg>
-                    </div>
-                    <h3>Email</h3>
-                    <a href="mailto:info@festronix.edu">info@festronix.edu</a>
-                </div>
-
-                <div class="contact-card fade-in-scroll">
-                    <div class="contact-icon phone">
-                        <svg fill="none" stroke="hsl(320, 70%, 55%)" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                        </svg>
-                    </div>
-                    <h3>Phone</h3>
-                    <a href="tel:+1234567890">+1 (234) 567-890</a>
-                </div>
-
-                <div class="contact-card fade-in-scroll">
-                    <div class="contact-icon location">
-                        <svg fill="none" stroke="hsl(180, 100%, 50%)" stroke-width="2" viewBox="0 0 24 24">
-                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                            <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
-                    </div>
-                    <h3>Location</h3>
-                    <p>123 Campus Drive<br>University City, ST 12345</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>© 2024 Festronix. All rights reserved. | Reach for the stars! 🚀</p>
-        </div>
-    </footer>
-
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <script>
-        // Star Field Animation
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
+        // Wait for Three.js to load
+        window.addEventListener('load', init);
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const stars = [];
-        for (let i = 0; i < 200; i++) {
-            stars.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 2,
-                speed: Math.random() * 0.5,
-                opacity: Math.random()
+        function init() {
+            const canvas = document.getElementById('canvas3d');
+            const loading = document.getElementById('loading');
+            
+            // Scene setup
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x0a0a0f, 10, 50);
+            
+            // Camera
+            const camera = new THREE.PerspectiveCamera(
+                50,
+                canvas.parentElement.clientWidth / canvas.parentElement.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(0, 3, 10);
+            
+            // Renderer
+            const renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true,
+                powerPreference: 'high-performance'
             });
-        }
-
-        function animateStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            stars.forEach(star => {
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-                ctx.fill();
-
-                // Twinkling effect
-                star.opacity += (Math.random() - 0.5) * 0.02;
-                star.opacity = Math.max(0.1, Math.min(1, star.opacity));
-
-                // Movement
-                star.y += star.speed;
-                if (star.y > canvas.height) {
-                    star.y = 0;
-                    star.x = Math.random() * canvas.width;
+            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x404040, 1);
+            scene.add(ambientLight);
+            
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            mainLight.position.set(10, 10, 5);
+            mainLight.castShadow = true;
+            scene.add(mainLight);
+            
+            const blueLight = new THREE.PointLight(0x0ea5e9, 2, 20);
+            blueLight.position.set(-5, 3, 5);
+            scene.add(blueLight);
+            
+            const purpleLight = new THREE.PointLight(0x9333ea, 2, 20);
+            purpleLight.position.set(5, 3, 5);
+            scene.add(purpleLight);
+            
+            const cyanLight = new THREE.PointLight(0x00d4ff, 1.5, 15);
+            cyanLight.position.set(0, -3, 3);
+            scene.add(cyanLight);
+            
+            // Create Beautiful Satellite
+            const satellite = new THREE.Group();
+            
+            // Main body - sleek metallic cylinder with golden accents
+            const bodyGeometry = new THREE.CylinderGeometry(0.9, 0.9, 2.5, 32);
+            const bodyMaterial = new THREE.MeshStandardMaterial({
+                color: 0xf0f0f0,
+                metalness: 0.95,
+                roughness: 0.15,
+                envMapIntensity: 1.5
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.castShadow = true;
+            satellite.add(body);
+            
+            // Golden rings around the body
+            for (let i = 0; i < 4; i++) {
+                const ringGeometry = new THREE.TorusGeometry(0.95, 0.08, 16, 32);
+                const ringMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xffd700,
+                    metalness: 1,
+                    roughness: 0.2,
+                    emissive: 0xffa500,
+                    emissiveIntensity: 0.3
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.rotation.x = Math.PI / 2;
+                ring.position.y = -0.9 + (i * 0.6);
+                ring.castShadow = true;
+                satellite.add(ring);
+            }
+            
+            // Enhanced Solar Panels with grid pattern
+            const createSolarPanel = (xPos) => {
+                const panelGroup = new THREE.Group();
+                
+                // Main panel base
+                const panelGeometry = new THREE.BoxGeometry(5, 0.08, 2);
+                const panelMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x1a1a3e,
+                    metalness: 0.9,
+                    roughness: 0.1,
+                    emissive: 0x0ea5e9,
+                    emissiveIntensity: 0.4
+                });
+                const panel = new THREE.Mesh(panelGeometry, panelMaterial);
+                panelGroup.add(panel);
+                
+                // Solar cells grid
+                const cellMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x3b82f6,
+                    metalness: 0.95,
+                    roughness: 0.05,
+                    emissive: 0x60a5fa,
+                    emissiveIntensity: 0.6
+                });
+                
+                for (let x = -2.3; x < 2.3; x += 0.5) {
+                    for (let z = -0.9; z < 0.9; z += 0.4) {
+                        const cellGeometry = new THREE.BoxGeometry(0.4, 0.02, 0.35);
+                        const cell = new THREE.Mesh(cellGeometry, cellMaterial);
+                        cell.position.set(x, 0.05, z);
+                        panelGroup.add(cell);
+                    }
+                }
+                
+                panelGroup.position.x = xPos;
+                panelGroup.castShadow = true;
+                return panelGroup;
+            };
+            
+            const leftPanel = createSolarPanel(-3.2);
+            const rightPanel = createSolarPanel(3.2);
+            satellite.add(leftPanel);
+            satellite.add(rightPanel);
+            
+            // Main Antenna Dish - larger and more detailed
+            const dishGeometry = new THREE.CylinderGeometry(1, 0.85, 0.15, 64);
+            const dishMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                metalness: 0.95,
+                roughness: 0.05,
+                side: THREE.DoubleSide
+            });
+            const dish = new THREE.Mesh(dishGeometry, dishMaterial);
+            dish.position.set(0, 1.5, 0);
+            dish.castShadow = true;
+            satellite.add(dish);
+            
+            // Inner dish receiver
+            const innerDishGeometry = new THREE.CylinderGeometry(0.3, 0.2, 0.1, 32);
+            const innerDishMaterial = new THREE.MeshStandardMaterial({
+                color: 0x00d4ff,
+                metalness: 0.9,
+                roughness: 0.1,
+                emissive: 0x00d4ff,
+                emissiveIntensity: 0.8
+            });
+            const innerDish = new THREE.Mesh(innerDishGeometry, innerDishMaterial);
+            innerDish.position.set(0, 1.55, 0);
+            satellite.add(innerDish);
+            
+            // Antenna support rod
+            const rodGeometry = new THREE.CylinderGeometry(0.08, 0.08, 1.2, 16);
+            const rodMaterial = new THREE.MeshStandardMaterial({
+                color: 0xc0c0c0,
+                metalness: 0.9,
+                roughness: 0.2
+            });
+            const rod = new THREE.Mesh(rodGeometry, rodMaterial);
+            rod.position.set(0, 2.1, 0);
+            satellite.add(rod);
+            
+            // Secondary antennas (thin rods)
+            const thinRodGeometry = new THREE.CylinderGeometry(0.03, 0.03, 1.5, 8);
+            const thinRodMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                metalness: 0.95,
+                roughness: 0.1
+            });
+            
+            const antennaPositions = [
+                { x: 0.5, y: -1.5, rot: Math.PI / 6 },
+                { x: -0.5, y: -1.5, rot: -Math.PI / 6 },
+                { x: 0, y: -1.6, rot: 0 }
+            ];
+            
+            antennaPositions.forEach(pos => {
+                const antenna = new THREE.Mesh(thinRodGeometry, thinRodMaterial);
+                antenna.position.set(pos.x, pos.y, 0);
+                antenna.rotation.z = pos.rot;
+                satellite.add(antenna);
+            });
+            
+            // Communication modules with glowing lights
+            const moduleGeometry = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+            const moduleMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1e293b,
+                metalness: 0.9,
+                roughness: 0.3
+            });
+            
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ff00,
+                transparent: true,
+                opacity: 0.9
+            });
+            
+            const modulePositions = [
+                [0.7, 0.8, 0.7],
+                [-0.7, 0.8, 0.7],
+                [0.7, -0.8, 0.7],
+                [-0.7, -0.8, 0.7],
+                [0.7, 0.8, -0.7],
+                [-0.7, 0.8, -0.7],
+                [0.7, -0.8, -0.7],
+                [-0.7, -0.8, -0.7]
+            ];
+            
+            modulePositions.forEach(pos => {
+                const module = new THREE.Mesh(moduleGeometry, moduleMaterial);
+                module.position.set(...pos);
+                module.castShadow = true;
+                satellite.add(module);
+                
+                // Add glowing indicator light
+                const lightGeometry = new THREE.SphereGeometry(0.1, 16, 16);
+                const light = new THREE.Mesh(lightGeometry, glowMaterial.clone());
+                light.position.set(pos[0], pos[1], pos[2] + 0.25);
+                satellite.add(light);
+            });
+            
+            // Glowing energy core in center
+            const coreGeometry = new THREE.SphereGeometry(0.25, 32, 32);
+            const coreMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ffff,
+                transparent: true,
+                opacity: 0.9
+            });
+            const core = new THREE.Mesh(coreGeometry, coreMaterial);
+            core.position.set(0, 0, 0);
+            satellite.add(core);
+            
+            // Outer glow rings around core
+            for (let i = 0; i < 3; i++) {
+                const glowRingGeometry = new THREE.TorusGeometry(0.3 + (i * 0.15), 0.02, 16, 32);
+                const glowRingMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x00d4ff,
+                    transparent: true,
+                    opacity: 0.6 - (i * 0.15)
+                });
+                const glowRing = new THREE.Mesh(glowRingGeometry, glowRingMaterial);
+                glowRing.rotation.x = Math.PI / 2;
+                satellite.add(glowRing);
+            }
+            
+            // Thruster nozzles at bottom
+            for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2;
+                const x = Math.cos(angle) * 0.6;
+                const z = Math.sin(angle) * 0.6;
+                
+                const thrusterGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.3, 16);
+                const thrusterMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x4a4a4a,
+                    metalness: 0.9,
+                    roughness: 0.4
+                });
+                const thruster = new THREE.Mesh(thrusterGeometry, thrusterMaterial);
+                thruster.position.set(x, -1.4, z);
+                satellite.add(thruster);
+                
+                // Thruster glow
+                const thrusterGlowGeometry = new THREE.CylinderGeometry(0.08, 0.12, 0.2, 16);
+                const thrusterGlowMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xff6600,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                const thrusterGlow = new THREE.Mesh(thrusterGlowGeometry, thrusterGlowMaterial);
+                thrusterGlow.position.set(x, -1.6, z);
+                satellite.add(thrusterGlow);
+            }
+            
+            scene.add(satellite);
+            
+            // Add stars background
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.1,
+                transparent: true,
+                opacity: 0.8
+            });
+            
+            const starsVertices = [];
+            for (let i = 0; i < 1000; i++) {
+                const x = (Math.random() - 0.5) * 100;
+                const y = (Math.random() - 0.5) * 100;
+                const z = (Math.random() - 0.5) * 100;
+                starsVertices.push(x, y, z);
+            }
+            
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+            const stars = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(stars);
+            
+            // Mouse/Touch controls
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            let autoRotate = true;
+            
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                autoRotate = false;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - previousMousePosition.x;
+                    const deltaY = e.clientY - previousMousePosition.y;
+                    
+                    satellite.rotation.y += deltaX * 0.01;
+                    satellite.rotation.x += deltaY * 0.01;
+                    
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
                 }
             });
-
-            requestAnimationFrame(animateStars);
-        }
-
-        animateStars();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        // Scroll animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+            
+            canvas.addEventListener('mouseup', () => {
+                isDragging = false;
+                setTimeout(() => { autoRotate = true; }, 2000);
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+                isDragging = false;
+            });
+            
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                autoRotate = false;
+                previousMousePosition = {
+                    x: e.touches[0].clientX,
+                    y: e.touches[0].clientY
+                };
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length === 1) {
+                    const deltaX = e.touches[0].clientX - previousMousePosition.x;
+                    const deltaY = e.touches[0].clientY - previousMousePosition.y;
+                    
+                    satellite.rotation.y += deltaX * 0.01;
+                    satellite.rotation.x += deltaY * 0.01;
+                    
+                    previousMousePosition = {
+                        x: e.touches[0].clientX,
+                        y: e.touches[0].clientY
+                    };
                 }
             });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.fade-in-scroll').forEach(el => {
-            observer.observe(el);
-        });
+            
+            canvas.addEventListener('touchend', () => {
+                isDragging = false;
+                setTimeout(() => { autoRotate = true; }, 2000);
+            });
+            
+            // Zoom with mouse wheel
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                camera.position.z += e.deltaY * 0.01;
+                camera.position.z = Math.max(5, Math.min(15, camera.position.z));
+            });
+            
+            // Window resize
+            window.addEventListener('resize', () => {
+                const width = canvas.parentElement.clientWidth;
+                const height = canvas.parentElement.clientHeight;
+                
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                
+                renderer.setSize(width, height);
+            });
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                const time = Date.now() * 0.001;
+                
+                // Auto-rotate satellite
+                if (autoRotate) {
+                    satellite.rotation.y += 0.005;
+                }
+                
+                // Animate solar panels - subtle tilt
+                leftPanel.rotation.y = Math.sin(time * 0.5) * 0.05;
+                rightPanel.rotation.y = Math.sin(time * 0.5) * 0.05;
+                
+                // Animate lights
+                blueLight.position.x = Math.sin(time) * 5;
+                blueLight.position.y = 3 + Math.cos(time * 0.5) * 2;
+                purpleLight.position.x = Math.cos(time) * 5;
+                purpleLight.position.y = 3 + Math.sin(time * 0.5) * 2;
+                
+                // Pulse the core
+                core.scale.setScalar(1 + Math.sin(time * 2) * 0.15);
+                core.material.opacity = 0.8 + Math.sin(time * 3) * 0.2;
+                
+                // Pulse the inner dish
+                innerDish.material.emissiveIntensity = 0.8 + Math.sin(time * 2) * 0.3;
+                
+                // Animate module lights
+                satellite.children.forEach(child => {
+                    if (child.geometry && child.geometry.type === 'SphereGeometry' && child.material.color.g === 1) {
+                        child.material.opacity = 0.7 + Math.sin(time * 4 + child.position.x) * 0.3;
+                    }
+                });
+                
+                // Animate thruster glows
+                satellite.children.forEach(child => {
+                    if (child.material && child.material.color.r === 1 && child.material.color.g === 0.4) {
+                        child.scale.y = 1 + Math.sin(time * 6 + child.position.x) * 0.3;
+                        child.material.opacity = 0.5 + Math.sin(time * 8 + child.position.x) * 0.3;
+                    }
+                });
+                
+                // Rotate stars slowly
+                stars.rotation.y += 0.0002;
+                stars.rotation.x += 0.0001;
+                
+                // Subtle camera movement for dynamism
+                if (autoRotate) {
+                    camera.position.y = 3 + Math.sin(time * 0.3) * 0.5;
+                }
+                
+                renderer.render(scene, camera);
+            }
+            
+            // Hide loading and start animation
+            loading.style.display = 'none';
+            canvas.style.display = 'block';
+            animate();
+        }
     </script>
 </body>
 </html>
