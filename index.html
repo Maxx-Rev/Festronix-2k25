@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Satellite Showcase | Interactive 3D Experience</title>
-    <meta name="description" content="Experience the future of web design with an interactive 3D satellite model and optimized WebGL graphics">
-    <meta name="keywords" content="3D satellite, interactive 3D, WebGL, Three.js, 3D showcase, space">
-    
+    <title>Festronix - College Space Events</title>
+    <meta name="description"
+        content="Join Festronix - The ultimate college space-themed event registration portal featuring cosmic experiences and stellar competitions">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -15,77 +20,274 @@
         }
 
         :root {
-            --background: hsl(240, 10%, 3.9%);
-            --foreground: hsl(0, 0%, 98%);
-            --primary: hsl(210, 100%, 50%);
-            --primary-glow: hsl(210, 100%, 65%);
-            --secondary: hsl(270, 60%, 60%);
-            --accent: hsl(180, 100%, 50%);
-            --muted: hsl(240, 5%, 15%);
-            --muted-foreground: hsl(240, 5%, 65%);
-            --border: hsl(240, 5%, 15%);
+            --space-dark: hsl(240, 30%, 5%);
+            --foreground: hsl(210, 40%, 98%);
+            --card: hsl(240, 25%, 8%);
+            --primary: hsl(280, 80%, 60%);
+            --secondary: hsl(260, 70%, 50%);
+            --accent: hsl(180, 80%, 50%);
+            --muted: hsl(240, 20%, 15%);
+            --muted-foreground: hsl(215, 20%, 65%);
+            --border: hsl(240, 30%, 20%);
+            --nebula-pink: hsl(320, 80%, 65%);
+            --nebula-purple: hsl(280, 70%, 55%);
+            --nebula-blue: hsl(220, 80%, 60%);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(180deg, hsl(240, 10%, 3.9%), hsl(240, 15%, 8%));
+            font-family: 'Orbitron', sans-serif;
+            background: var(--space-dark);
             color: var(--foreground);
-            min-height: 100vh;
             overflow-x: hidden;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
+            scroll-behavior: smooth;
         }
 
         .container {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 3rem 1rem;
+            padding: 0 1rem;
+        }
+
+        /* Star Field Canvas */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1a1a3e 0%, #0a0a19 100%);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s;
+            padding: 1rem 0;
+        }
+
+        nav.scrolled {
+            background: rgba(15, 15, 30, 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 3rem;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--foreground);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--foreground);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        /* Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes scrollLeft {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        @keyframes scrollRight {
+            0% {
+                transform: translateX(-50%);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(168, 85, 247, 0.8);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 1s ease-out;
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .animate-pulse {
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .animate-glow {
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        /* Utility Classes */
+        .glow-text {
+            text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--primary);
+        }
+
+        .glow-border {
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5), inset 0 0 15px rgba(168, 85, 247, 0.1);
+        }
+
+        /* Sections */
+        section {
+            min-height: 100vh;
+            padding: 5rem 0;
+            position: relative;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-divider {
+            width: 6rem;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent), var(--secondary));
+            margin: 0 auto 3rem;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.25rem;
+            color: var(--muted-foreground);
+            max-width: 48rem;
+            margin: 0 auto 4rem;
+            line-height: 1.8;
         }
 
         /* Hero Section */
-        .hero {
-            text-align: center;
-            margin-bottom: 3rem;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .badge {
-            display: inline-flex;
+        #home {
+            display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            background: hsl(240, 10%, 10%, 0.5);
-            backdrop-filter: blur(12px);
-            border: 1px solid hsl(240, 5%, 20%, 0.3);
-            font-size: 0.875rem;
+            justify-content: center;
+            text-align: center;
+            padding-top: 8rem;
+            background-image: url(hero-space-bg.jpg);
+        }
+
+        #home h1 {
+            font-size: 5rem;
+            margin: 2rem 0;
+        }
+
+        #home .hero-description {
+            font-size: 1.5rem;
+            line-height: 1.8;
             color: var(--muted-foreground);
-            margin-bottom: 1.5rem;
+            max-width: 48rem;
+            margin: 0 auto 3rem;
         }
 
-        .badge-icon {
-            color: var(--accent);
-        }
-
-        h1 {
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: glowPulse 3s ease-in-out infinite;
-        }
-
-        .subtitle {
-            font-size: 1.25rem;
-            color: var(--muted-foreground);
-            max-width: 42rem;
-            margin: 0 auto 2rem;
-        }
-
-        .button-group {
+        .hero-buttons {
             display: flex;
             gap: 1rem;
             justify-content: center;
@@ -93,813 +295,1228 @@
         }
 
         .btn {
-            padding: 0.75rem 2rem;
-            border-radius: 0.75rem;
-            font-weight: 500;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 1.125rem;
             text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
         }
 
         .btn-primary {
             background: var(--primary);
             color: white;
-            box-shadow: 0 0 40px hsl(210, 100%, 50%, 0.3);
         }
 
         .btn-primary:hover {
+            background: hsl(280, 80%, 50%);
             transform: scale(1.05);
-            box-shadow: 0 0 60px hsl(210, 100%, 50%, 0.5);
         }
 
-        .btn-outline {
-            background: hsl(240, 10%, 10%, 0.5);
-            backdrop-filter: blur(12px);
-            border: 1px solid hsl(210, 100%, 50%, 0.2);
+        .btn-secondary {
+            background: var(--card);
             color: var(--foreground);
+            border: 2px solid var(--primary);
         }
 
-        .btn-outline:hover {
-            background: hsl(210, 100%, 50%, 0.1);
-        }
-
-        /* Grid Layout */
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            align-items: start;
-        }
-
-        @media (min-width: 1024px) {
-            .grid {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 4rem;
-            animation: fadeIn 0.6s ease-out 0.4s backwards;
-        }
-
-        /* 3D Canvas */
-        .canvas-container {
-            height: 500px;
-            border-radius: 1rem;
-            overflow: hidden;
-            background: hsl(240, 10%, 10%, 0.5);
-            backdrop-filter: blur(12px);
-            border: 1px solid hsl(240, 5%, 20%, 0.3);
-            box-shadow: 0 0 40px hsl(210, 100%, 50%, 0.3);
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        @media (min-width: 1024px) {
-            .canvas-container {
-                height: 600px;
-            }
-        }
-
-        #canvas3d {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        /* Control Panel */
-        .control-panel {
-            background: hsl(240, 10%, 10%, 0.5);
-            backdrop-filter: blur(12px);
-            border: 1px solid hsl(240, 5%, 20%, 0.3);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            animation: fadeIn 0.6s ease-out 0.2s backwards;
-        }
-
-        .control-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .control-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .control-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .control-icon.primary { background: hsl(210, 100%, 50%, 0.1); color: var(--primary); }
-        .control-icon.accent { background: hsl(180, 100%, 50%, 0.1); color: var(--accent); }
-        .control-icon.secondary { background: hsl(270, 60%, 60%, 0.1); color: var(--secondary); }
-
-        .control-text h4 {
-            font-weight: 500;
-            margin-bottom: 0.125rem;
-        }
-
-        .control-text p {
-            font-size: 0.875rem;
-            color: var(--muted-foreground);
-        }
-
-        .control-footer {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.75rem;
-            color: var(--muted-foreground);
-        }
-
-        /* Feature Cards */
-        .card {
-            background: hsl(240, 10%, 10%, 0.5);
-            backdrop-filter: blur(12px);
-            border: 1px solid hsl(240, 5%, 20%, 0.3);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
+        .btn-secondary:hover {
             transform: scale(1.05);
         }
 
-        .card-icon {
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1.5rem;
+            height: 2.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 9999px;
+            display: flex;
+            justify-content: center;
+            padding: 0.5rem;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .scroll-dot {
+            width: 0.25rem;
+            height: 0.75rem;
+            background: var(--primary);
+            border-radius: 9999px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 4rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 15, 30, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-icon {
             width: 3rem;
             height: 3rem;
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
+            margin: 0 auto 1rem;
         }
 
-        .card-icon.gradient-1 {
-            background: linear-gradient(135deg, var(--primary), var(--primary-glow));
-            box-shadow: 0 0 40px hsl(210, 100%, 50%, 0.3);
-        }
-
-        .card-icon.gradient-2 {
-            background: linear-gradient(135deg, var(--accent), var(--primary));
-            box-shadow: 0 0 40px hsl(180, 100%, 50%, 0.4);
-        }
-
-        .card-icon.gradient-3 {
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            box-shadow: 0 0 40px hsl(210, 100%, 50%, 0.3);
-        }
-
-        .card h3 {
-            font-size: 1.25rem;
-            font-weight: 700;
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
             margin-bottom: 0.5rem;
         }
 
-        .card p {
+        .stat-label {
             color: var(--muted-foreground);
         }
 
-        /* Loading State */
-        .loading {
+        /* About Grid */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 4rem;
+        }
+
+        .model-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Events Grid */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .event-card {
+            background: rgba(15, 15, 30, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 2rem;
+            transition: all 0.5s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .event-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .event-card:hover::before {
+            opacity: 0.2;
+        }
+
+        .event-card:hover {
+            transform: scale(1.05);
+        }
+
+        .event-card>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .event-icon {
+            width: 3rem;
+            height: 3rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.5s;
+        }
+
+        .event-card:hover .event-icon {
+            transform: scale(1.1) rotate(12deg);
+        }
+
+        .event-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            transition: color 0.3s;
+        }
+
+        .event-card:hover .event-title {
+            color: var(--primary);
+        }
+
+        .event-description {
+            color: var(--muted-foreground);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .event-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .event-prize {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* Gallery */
+        .gallery-track {
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .gallery-content {
+            display: flex;
+            gap: 1.5rem;
+            animation: scrollLeft 30s linear infinite;
+        }
+
+        .gallery-content.reverse {
+            animation: scrollRight 30s linear infinite;
+        }
+
+        .gallery-item {
+            flex-shrink: 0;
+            width: 20rem;
+            height: 13rem;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Coordinators */
+        .coordinators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .coordinator-card {
+            height: 24rem;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s;
+            transform-style: preserve-3d;
+        }
+
+        .coordinator-card:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .card-front {
+            background: rgba(15, 15, 30, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-back {
+            background: rgba(15, 15, 30, 0.9);
+            backdrop-filter: blur(10px);
+            transform: rotateY(180deg);
+            padding: 2rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 100%;
-            color: var(--muted-foreground);
         }
 
-        .spinner {
+        .coordinator-image {
+            width: 100%;
+            height: 16rem;
+            object-fit: cover;
+        }
+
+        .coordinator-info {
+            padding: 1.5rem;
+        }
+
+        .coordinator-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .coordinator-role {
+            color: var(--muted-foreground);
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .contact-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--accent);
+        }
+
+        /* Contact */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 80rem;
+            margin: 0 auto 4rem;
+        }
+
+        .contact-card {
+            background: rgba(15, 15, 30, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .contact-card:hover {
+            transform: scale(1.05);
+        }
+
+        .contact-icon-wrapper {
             width: 4rem;
             height: 4rem;
-            border: 4px solid var(--muted);
-            border-top-color: var(--primary);
+            background: rgba(168, 85, 247, 0.2);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .contact-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
         }
 
-        @keyframes glowPulse {
-            0%, 100% {
-                filter: drop-shadow(0 0 20px hsl(210, 100%, 50%, 0.3));
-            }
-            50% {
-                filter: drop-shadow(0 0 40px hsl(210, 100%, 50%, 0.6)) drop-shadow(0 0 60px hsl(180, 100%, 50%, 0.4));
-            }
+        .contact-value {
+            color: var(--muted-foreground);
+            word-break: break-word;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .quick-response {
+            max-width: 40rem;
+            margin: 0 auto;
+            background: rgba(15, 15, 30, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
         }
 
-        /* Icons */
-        .icon {
-            width: 1.5rem;
-            height: 1.5rem;
+        .response-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 15, 30, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        footer p {
+            color: var(--muted-foreground);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .heart {
+            color: var(--primary);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            #home h1 {
+                font-size: 3rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .hero-description,
+            .section-subtitle {
+                font-size: 1rem;
+            }
+
+            .stats-grid,
+            .events-grid,
+            .coordinators-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <!-- Hero Section -->
-        <div class="hero">
-            <div class="badge">
-                <svg class="icon badge-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-                <span>Interactive 3D Satellite Experience</span>
-            </div>
-            
-            <h1>3D Satellite Showcase</h1>
-            
-            <p class="subtitle">
-                Experience the future of web design with an interactive 3D satellite model. 
-                Interact with the satellite using your mouse or touch gestures.
-            </p>
-            
-            <div class="button-group">
-                <button class="btn btn-primary">
-                    Get Started
-                </button>
-                <a href="https://github.com" class="btn btn-outline">
-                    <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+    <!-- Star Field Canvas -->
+    <canvas id="starfield"></canvas>
+
+    <!-- Navigation -->
+    <nav id="nav">
+        <div class="container">
+            <div class="nav-container">
+                <a href="#home">
+                    <svg class="logo" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <text x="10" y="35" font-family="Orbitron" font-size="24" font-weight="bold"
+                            fill="url(#logo-gradient)">FESTRONIX</text>
+                        <defs>
+                            <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:hsl(280, 80%, 60%);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:hsl(180, 80%, 50%);stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
                     </svg>
-                    View Code
                 </a>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#events">Events</a></li>
+                    <li><a href="#gallery">Gallery</a></li>
+                    <li><a href="#coordinators">Coordinators</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <button class="menu-toggle" id="menuToggle">☰</button>
+            </div>
+            <div class="mobile-menu" id="mobileMenu">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#events">Events</a>
+                <a href="#gallery">Gallery</a>
+                <a href="#coordinators">Coordinators</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home">
+        <div class="container animate-scale-in">
+            <svg width="600" height="150" viewBox="0 0 600 150" style="max-width: 100%;">
+                <defs>
+                    <linearGradient id="title-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:hsl(280, 80%, 60%);stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:hsl(220, 80%, 60%);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:hsl(180, 80%, 50%);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Orbitron"
+                    font-size="48" font-weight="bold" fill="url(#title-gradient)" class="glow-text">FESTRONIX</text>
+            </svg>
+            <h1 class="glow-text">FESTRONIX</h1>
+            <p class="hero-description">
+                Embark on an extraordinary journey through the cosmos of innovation, creativity, and competition.
+                Join us for the most stellar college event experience of the year.
+            </p>
+            <div class="hero-buttons">
+                <a href="#events" class="btn btn-primary glow-border">Explore Events</a>
+                <a href="#about" class="btn btn-secondary">Learn More</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="scroll-dot"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container animate-fade-in">
+            <h2 class="section-title glow-text">About Festronix</h2>
+            <div class="section-divider"></div>
+            <p class="section-subtitle">
+                Festronix is not just an event—it's a cosmic celebration of talent, innovation, and boundless
+                creativity.
+                Our space-themed extravaganza brings together the brightest minds from colleges across the region.
+            </p>
+
+            <div class="stats-grid">
+                <div class="stat-card glow-border">
+                    <div class="stat-value">500+</div>
+                    <div class="stat-label">Participants</div>
+                </div>
+                <div class="stat-card glow-border">
+                    <div class="stat-value">20+</div>
+                    <div class="stat-label">Events</div>
+                </div>
+                <div class="stat-card glow-border">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Days</div>
+                </div>
+                <div class="stat-card glow-border">
+                    <div class="stat-value">₹50K+</div>
+                    <div class="stat-label">Prizes</div>
+                </div>
+            </div>
+
+            <div class="about-grid">
+                <div>
+                    <h3 style="font-size: 2rem; color: var(--primary); margin-bottom: 1.5rem;">Mission Control</h3>
+                    <p style="color: var(--muted-foreground); margin-bottom: 1.5rem; line-height: 1.8;">
+                        Our mission is to create an unforgettable experience that transcends traditional college fests.
+                        Through cutting-edge technology, immersive experiences, and thrilling competitions, we aim to
+                        inspire the next generation of innovators and leaders.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; gap: 0.75rem;">
+                            <span style="color: var(--primary);">●</span>
+                            <span>Technical workshops and hackathons</span>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <span style="color: var(--accent);">●</span>
+                            <span>Cultural performances and competitions</span>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <span style="color: var(--secondary);">●</span>
+                            <span>Industry expert talks and networking</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="model-container">
+                    <canvas id="rocketModel" width="300" height="300"></canvas>
+                </div>
+            </div>
+
+            <div class="about-grid" style="margin-top: 4rem;">
+                <div class="model-container">
+                    <canvas id="satelliteModel" width="300" height="300"></canvas>
+                </div>
+                <div>
+                    <h3 style="font-size: 2rem; color: var(--accent); margin-bottom: 1.5rem;">Event Highlights</h3>
+                    <p style="color: var(--muted-foreground); margin-bottom: 1.5rem; line-height: 1.8;">
+                        Experience the fusion of technology and creativity in a space-themed environment. From AI
+                        competitions
+                        to dance battles, coding marathons to art exhibitions, Festronix offers something for everyone.
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                        <div class="stat-card glow-border">
+                            <div class="stat-value" style="font-size: 1.5rem;">48hrs</div>
+                            <div class="stat-label">Non-stop Action</div>
+                        </div>
+                        <div class="stat-card glow-border">
+                            <div class="stat-value" style="font-size: 1.5rem;">15+</div>
+                            <div class="stat-label">Colleges</div>
+                        </div>
+                        <div class="stat-card glow-border">
+                            <div class="stat-value" style="font-size: 1.5rem;">100%</div>
+                            <div class="stat-label">Epic Fun</div>
+                        </div>
+                        <div class="stat-card glow-border">
+                            <div class="stat-value" style="font-size: 1.5rem;">∞</div>
+                            <div class="stat-label">Memories</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section id="events">
+        <div class="container animate-fade-in">
+            <h2 class="section-title glow-text">Featured Events</h2>
+            <div class="section-divider"></div>
+            <p class="section-subtitle">
+                Explore our constellation of exciting events designed to challenge, inspire, and entertain
+            </p>
+
+            <div class="events-grid">
+                <div class="event-card glow-border">
+                    <div class="event-icon">💻</div>
+                    <h3 class="event-title">Code Odyssey</h3>
+                    <p class="event-description">
+                        A 24-hour hackathon where teams build innovative solutions to real-world problems.
+                    </p>
+                    <div class="event-footer">
+                        <span style="color: var(--muted-foreground); font-size: 0.875rem;">Prize Pool</span>
+                        <span class="event-prize">₹15,000</span>
+                    </div>
+                </div>
+
+                <div class="event-card glow-border">
+                    <div class="event-icon">🎨</div>
+                    <h3 class="event-title">Creative Cosmos</h3>
+                    <p class="event-description">
+                        Showcase your artistic talents through digital art, design, and multimedia competitions.
+                    </p>
+                    <div class="event-footer">
+                        <span style="color: var(--muted-foreground); font-size: 0.875rem;">Prize Pool</span>
+                        <span class="event-prize">₹10,000</span>
+                    </div>
+                </div>
+
+                <div class="event-card glow-border">
+                    <div class="event-icon">🎵</div>
+                    <h3 class="event-title">Stellar Beats</h3>
+                    <p class="event-description">
+                        Music and dance competitions featuring battles, performances, and DJ nights.
+                    </p>
+                    <div class="event-footer">
+                        <span style="color: var(--muted-foreground); font-size: 0.875rem;">Prize Pool</span>
+                        <span class="event-prize">₹12,000</span>
+                    </div>
+                </div>
+
+                <div class="event-card glow-border">
+                    <div class="event-icon">⚡</div>
+                    <h3 class="event-title">Tech Arena</h3>
+                    <p class="event-description">
+                        Gaming tournaments, robotics competitions, and technical quizzes for tech enthusiasts.
+                    </p>
+                    <div class="event-footer">
+                        <span style="color: var(--muted-foreground); font-size: 0.875rem;">Prize Pool</span>
+                        <span class="event-prize">₹13,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 3rem;">
+                <button class="btn btn-primary glow-border">Register Now</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery">
+        <div class="container" style="margin-bottom: 4rem;">
+            <h2 class="section-title glow-text">Cosmic Gallery</h2>
+            <div class="section-divider"></div>
+            <p class="section-subtitle">
+                Glimpse into our universe of memorable moments and stellar experiences
+            </p>
+        </div>
+
+        <div class="gallery-track">
+            <div class="gallery-content">
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#a855f7,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Galaxy 1</div>
+                </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#06b6d4,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Nebula 2</div>
+                </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#ec4899,#a855f7);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Cosmos 3</div>
+                </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#a855f7,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Galaxy 1</div>
+                </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#06b6d4,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Nebula 2</div>
+                </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#ec4899,#a855f7);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Cosmos 3</div>
+                </div>
             </div>
         </div>
 
-        <!-- Main Grid -->
-        <div class="grid">
-            <!-- 3D Canvas -->
-            <div class="canvas-container">
-                <div id="loading" class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading 3D Satellite...</p>
+        <div class="gallery-track">
+            <div class="gallery-content reverse">
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Space 4</div>
                 </div>
-                <canvas id="canvas3d"></canvas>
-            </div>
-            
-            <!-- Control Panel -->
-            <div class="control-panel">
-                <h3 class="control-title">Controls</h3>
-                
-                <div class="control-item">
-                    <div class="control-icon primary">
-                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                        </svg>
-                    </div>
-                    <div class="control-text">
-                        <h4>Rotate</h4>
-                        <p>Click & drag to rotate</p>
-                    </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#f59e0b,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Aurora 5</div>
                 </div>
-                
-                <div class="control-item">
-                    <div class="control-icon accent">
-                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                        </svg>
-                    </div>
-                    <div class="control-text">
-                        <h4>Zoom</h4>
-                        <p>Scroll to zoom in/out</p>
-                    </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Stars 6</div>
                 </div>
-                
-                <div class="control-item">
-                    <div class="control-icon secondary">
-                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                    </div>
-                    <div class="control-text">
-                        <h4>Auto-Rotate</h4>
-                        <p>Enabled by default</p>
-                    </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Space 4</div>
                 </div>
-                
-                <div class="control-footer">
-                    Interactive 3D satellite model with optimized rendering using WebGL
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#f59e0b,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Aurora 5</div>
+                </div>
+                <div class="gallery-item glow-border">
+                    <div
+                        style="width:100%;height:100%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                        Stars 6</div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Features Grid -->
-        <div class="grid-3">
-            <div class="card">
-                <div class="card-icon gradient-1">
-                    <svg class="icon" fill="none" stroke="white" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </div>
-                <h3>Optimized Performance</h3>
-                <p>Hardware-accelerated WebGL rendering with adaptive quality for smooth 60fps on all devices.</p>
-            </div>
+    <!-- Coordinators Section -->
+    <section id="coordinators">
+        <div class="container">
+            <h2 class="section-title glow-text">Mission Crew</h2>
+            <div class="section-divider"></div>
+            <p class="section-subtitle">
+                Meet the stellar team behind Festronix's cosmic success
+            </p>
 
-            <div class="card">
-                <div class="card-icon gradient-2">
-                    <svg class="icon" fill="none" stroke="white" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                    </svg>
+            <div class="coordinators-grid">
+                <!-- Coordinator 1 -->
+                <div class="coordinator-card">
+                    <div class="card-inner">
+                        <div class="card-front glow-border">
+                            <div
+                                style="width:100%;height:16rem;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:3rem;">
+                                👨‍💼</div>
+                            <div class="coordinator-info">
+                                <h3 class="coordinator-name">Alex Chen</h3>
+                                <p class="coordinator-role">Chief Coordinator</p>
+                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
+                            </div>
+                        </div>
+                        <div class="card-back glow-border">
+                            <h3 class="coordinator-name">Alex Chen</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <span>✉️</span>
+                                    <span>alex.chen@festronix.edu</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>📞</span>
+                                    <span>+91 98765 43210</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>💼</span>
+                                    <span>linkedin.com/in/alexchen</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
+                        </div>
+                    </div>
                 </div>
-                <h3>Fully Interactive</h3>
-                <p>Intuitive controls with mouse, touch, and keyboard support. Rotate, zoom, and explore the satellite freely.</p>
-            </div>
 
-            <div class="card">
-                <div class="card-icon gradient-3">
-                    <svg class="icon" fill="none" stroke="white" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
+                <!-- Coordinator 2 -->
+                <div class="coordinator-card">
+                    <div class="card-inner">
+                        <div class="card-front glow-border">
+                            <div
+                                style="width:100%;height:16rem;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;font-size:3rem;">
+                                👩‍💻</div>
+                            <div class="coordinator-info">
+                                <h3 class="coordinator-name">Priya Sharma</h3>
+                                <p class="coordinator-role">Technical Lead</p>
+                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
+                            </div>
+                        </div>
+                        <div class="card-back glow-border">
+                            <h3 class="coordinator-name">Priya Sharma</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <span>✉️</span>
+                                    <span>priya.sharma@festronix.edu</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>📞</span>
+                                    <span>+91 98765 43211</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>💼</span>
+                                    <span>linkedin.com/in/priyasharma</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
+                        </div>
+                    </div>
                 </div>
-                <h3>Modern Tech</h3>
-                <p>Built with Three.js for cutting-edge 3D web experiences using pure WebGL technology.</p>
+
+                <!-- Coordinator 3 -->
+                <div class="coordinator-card">
+                    <div class="card-inner">
+                        <div class="card-front glow-border">
+                            <div
+                                style="width:100%;height:16rem;background:linear-gradient(135deg,#4facfe,#00f2fe);display:flex;align-items:center;justify-content:center;font-size:3rem;">
+                                👨‍🎤</div>
+                            <div class="coordinator-info">
+                                <h3 class="coordinator-name">Rahul Verma</h3>
+                                <p class="coordinator-role">Events Manager</p>
+                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
+                            </div>
+                        </div>
+                        <div class="card-back glow-border">
+                            <h3 class="coordinator-name">Rahul Verma</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <span>✉️</span>
+                                    <span>rahul.verma@festronix.edu</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>📞</span>
+                                    <span>+91 98765 43212</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>💼</span>
+                                    <span>linkedin.com/in/rahulverma</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coordinator 4 -->
+                <div class="coordinator-card">
+                    <div class="card-inner">
+                        <div class="card-front glow-border">
+                            <div
+                                style="width:100%;height:16rem;background:linear-gradient(135deg,#fa709a,#fee140);display:flex;align-items:center;justify-content:center;font-size:3rem;">
+                                👩‍🎨</div>
+                            <div class="coordinator-info">
+                                <h3 class="coordinator-name">Sarah Johnson</h3>
+                                <p class="coordinator-role">Marketing Head</p>
+                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
+                            </div>
+                        </div>
+                        <div class="card-back glow-border">
+                            <h3 class="coordinator-name">Sarah Johnson</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <span>✉️</span>
+                                    <span>sarah.j@festronix.edu</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>📞</span>
+                                    <span>+91 98765 43213</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>💼</span>
+                                    <span>linkedin.com/in/sarahjohnson</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coordinator 5 -->
+                <div class="coordinator-card">
+                    <div class="card-inner">
+                        <div class="card-front glow-border">
+                            <div
+                                style="width:100%;height:16rem;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;font-size:3rem;">
+                                👨‍💼</div>
+                            <div class="coordinator-info">
+                                <h3 class="coordinator-name">Arjun Patel</h3>
+                                <p class="coordinator-role">Sponsorship Lead</p>
+                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
+                            </div>
+                        </div>
+                        <div class="card-back glow-border">
+                            <h3 class="coordinator-name">Arjun Patel</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <span>✉️</span>
+                                    <span>arjun.p@festronix.edu</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>📞</span>
+                                    <span>+91 98765 43214</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>💼</span>
+                                    <span>linkedin.com/in/arjunpatel</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coordinator 6 -->
+                <div class="coordinator-card">
+                    <div class="card-inner">
+                        <div class="card-front glow-border">
+                            <div
+                                style="width:100%;height:16rem;background:linear-gradient(135deg,#a8edea,#fed6e3);display:flex;align-items:center;justify-content:center;font-size:3rem;">
+                                👩‍🎬</div>
+                            <div class="coordinator-info">
+                                <h3 class="coordinator-name">Maya Rodriguez</h3>
+                                <p class="coordinator-role">Creative Director</p>
+                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
+                            </div>
+                        </div>
+                        <div class="card-back glow-border">
+                            <h3 class="coordinator-name">Maya Rodriguez</h3>
+                            <div class="contact-info">
+                                <div class="contact-item">
+                                    <span>✉️</span>
+                                    <span>maya.r@festronix.edu</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>📞</span>
+                                    <span>+91 98765 43215</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span>💼</span>
+                                    <span>linkedin.com/in/mayarodriguez</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <h2 class="section-title glow-text">Contact Mission Control</h2>
+            <div class="section-divider"></div>
+            <p class="section-subtitle">
+                Ready to join the cosmic adventure? Reach out to us for any queries or registrations
+            </p>
+
+            <div class="contact-grid">
+                <div class="contact-card glow-border">
+                    <div class="contact-icon-wrapper animate-pulse">
+                        <span style="font-size: 2rem;">📍</span>
+                    </div>
+                    <h3 class="contact-title">Location</h3>
+                    <p class="contact-value">Tech Campus, Innovation Street, City - 123456</p>
+                </div>
+
+                <div class="contact-card glow-border">
+                    <div class="contact-icon-wrapper animate-pulse">
+                        <span style="font-size: 2rem;">✉️</span>
+                    </div>
+                    <h3 class="contact-title">Email</h3>
+                    <p class="contact-value">info@festronix.edu</p>
+                </div>
+
+                <div class="contact-card glow-border">
+                    <div class="contact-icon-wrapper animate-pulse">
+                        <span style="font-size: 2rem;">📞</span>
+                    </div>
+                    <h3 class="contact-title">Phone</h3>
+                    <p class="contact-value">+91 98765 43200</p>
+                </div>
+
+                <div class="contact-card glow-border">
+                    <div class="contact-icon-wrapper animate-pulse">
+                        <span style="font-size: 2rem;">🌐</span>
+                    </div>
+                    <h3 class="contact-title">Website</h3>
+                    <p class="contact-value">www.festronix.edu</p>
+                </div>
+            </div>
+
+            <div class="quick-response glow-border">
+                <h3 style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 1rem;">Quick
+                    Response Team</h3>
+                <p style="color: var(--muted-foreground); margin-bottom: 1.5rem;">
+                    Our team is available 24/7 during the event period. For urgent matters, please call our helpline.
+                </p>
+                <div class="response-buttons">
+                    <a href="mailto:info@festronix.edu" class="btn btn-primary">Send Email</a>
+                    <a href="tel:+919876543200" class="btn" style="background: var(--accent); color: white;">Call
+                        Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Made with <span class="heart">❤️</span> by the Festronix Team</p>
+            <p style="font-size: 0.875rem; margin-top: 0.5rem;">© 2025 Festronix. All rights reserved.</p>
+        </div>
+    </footer>
 
     <!-- Three.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <script>
-        // Wait for Three.js to load
-        window.addEventListener('load', init);
 
-        function init() {
-            const canvas = document.getElementById('canvas3d');
-            const loading = document.getElementById('loading');
-            
-            // Scene setup
+    <!-- JavaScript -->
+    <script>
+        // Star Field Animation
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const stars = [];
+        for (let i = 0; i < 200; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 0.5 + 0.1
+            });
+        }
+
+        function animateStars() {
+            ctx.fillStyle = 'rgba(10, 10, 25, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(star => {
+                ctx.fillStyle = 'white';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'white';
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                star.y += star.speed;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+
+            requestAnimationFrame(animateStars);
+        }
+        animateStars();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Navigation Scroll Effect
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            menuToggle.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+        });
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                menuToggle.textContent = '☰';
+            });
+        });
+
+        // 3D Rocket Model
+        function createRocket() {
+            const canvas = document.getElementById('rocketModel');
             const scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0x0a0a0f, 10, 50);
-            
-            // Camera
-            const camera = new THREE.PerspectiveCamera(
-                50,
-                canvas.parentElement.clientWidth / canvas.parentElement.clientHeight,
-                0.1,
-                1000
-            );
-            camera.position.set(0, 3, 10);
-            
-            // Renderer
-            const renderer = new THREE.WebGLRenderer({
-                canvas: canvas,
-                antialias: true,
-                alpha: true,
-                powerPreference: 'high-performance'
-            });
-            renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            
-            // Lights
-            const ambientLight = new THREE.AmbientLight(0x404040, 1);
+            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(300, 300);
+
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
             scene.add(ambientLight);
-            
-            const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
-            mainLight.position.set(10, 10, 5);
-            mainLight.castShadow = true;
-            scene.add(mainLight);
-            
-            const blueLight = new THREE.PointLight(0x0ea5e9, 2, 20);
-            blueLight.position.set(-5, 3, 5);
-            scene.add(blueLight);
-            
-            const purpleLight = new THREE.PointLight(0x9333ea, 2, 20);
-            purpleLight.position.set(5, 3, 5);
-            scene.add(purpleLight);
-            
-            const cyanLight = new THREE.PointLight(0x00d4ff, 1.5, 15);
-            cyanLight.position.set(0, -3, 3);
-            scene.add(cyanLight);
-            
-            // Create Beautiful Satellite
-            const satellite = new THREE.Group();
-            
-            // Main body - sleek metallic cylinder with golden accents
-            const bodyGeometry = new THREE.CylinderGeometry(0.9, 0.9, 2.5, 32);
-            const bodyMaterial = new THREE.MeshStandardMaterial({
-                color: 0xf0f0f0,
-                metalness: 0.95,
-                roughness: 0.15,
-                envMapIntensity: 1.5
-            });
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+
+            const pointLight1 = new THREE.PointLight(0xff00ff, 1, 100);
+            pointLight1.position.set(10, 10, 10);
+            scene.add(pointLight1);
+
+            const rocket = new THREE.Group();
+
+            const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 32);
+            const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc, shininess: 100 });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            body.castShadow = true;
-            satellite.add(body);
-            
-            // Golden rings around the body
-            for (let i = 0; i < 4; i++) {
-                const ringGeometry = new THREE.TorusGeometry(0.95, 0.08, 16, 32);
-                const ringMaterial = new THREE.MeshStandardMaterial({
-                    color: 0xffd700,
-                    metalness: 1,
-                    roughness: 0.2,
-                    emissive: 0xffa500,
-                    emissiveIntensity: 0.3
-                });
-                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-                ring.rotation.x = Math.PI / 2;
-                ring.position.y = -0.9 + (i * 0.6);
-                ring.castShadow = true;
-                satellite.add(ring);
-            }
-            
-            // Enhanced Solar Panels with grid pattern
-            const createSolarPanel = (xPos) => {
-                const panelGroup = new THREE.Group();
-                
-                // Main panel base
-                const panelGeometry = new THREE.BoxGeometry(5, 0.08, 2);
-                const panelMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x1a1a3e,
-                    metalness: 0.9,
-                    roughness: 0.1,
-                    emissive: 0x0ea5e9,
-                    emissiveIntensity: 0.4
-                });
-                const panel = new THREE.Mesh(panelGeometry, panelMaterial);
-                panelGroup.add(panel);
-                
-                // Solar cells grid
-                const cellMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x3b82f6,
-                    metalness: 0.95,
-                    roughness: 0.05,
-                    emissive: 0x60a5fa,
-                    emissiveIntensity: 0.6
-                });
-                
-                for (let x = -2.3; x < 2.3; x += 0.5) {
-                    for (let z = -0.9; z < 0.9; z += 0.4) {
-                        const cellGeometry = new THREE.BoxGeometry(0.4, 0.02, 0.35);
-                        const cell = new THREE.Mesh(cellGeometry, cellMaterial);
-                        cell.position.set(x, 0.05, z);
-                        panelGroup.add(cell);
-                    }
-                }
-                
-                panelGroup.position.x = xPos;
-                panelGroup.castShadow = true;
-                return panelGroup;
-            };
-            
-            const leftPanel = createSolarPanel(-3.2);
-            const rightPanel = createSolarPanel(3.2);
-            satellite.add(leftPanel);
-            satellite.add(rightPanel);
-            
-            // Main Antenna Dish - larger and more detailed
-            const dishGeometry = new THREE.CylinderGeometry(1, 0.85, 0.15, 64);
-            const dishMaterial = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                metalness: 0.95,
-                roughness: 0.05,
-                side: THREE.DoubleSide
-            });
-            const dish = new THREE.Mesh(dishGeometry, dishMaterial);
-            dish.position.set(0, 1.5, 0);
-            dish.castShadow = true;
-            satellite.add(dish);
-            
-            // Inner dish receiver
-            const innerDishGeometry = new THREE.CylinderGeometry(0.3, 0.2, 0.1, 32);
-            const innerDishMaterial = new THREE.MeshStandardMaterial({
-                color: 0x00d4ff,
-                metalness: 0.9,
-                roughness: 0.1,
-                emissive: 0x00d4ff,
-                emissiveIntensity: 0.8
-            });
-            const innerDish = new THREE.Mesh(innerDishGeometry, innerDishMaterial);
-            innerDish.position.set(0, 1.55, 0);
-            satellite.add(innerDish);
-            
-            // Antenna support rod
-            const rodGeometry = new THREE.CylinderGeometry(0.08, 0.08, 1.2, 16);
-            const rodMaterial = new THREE.MeshStandardMaterial({
-                color: 0xc0c0c0,
-                metalness: 0.9,
-                roughness: 0.2
-            });
-            const rod = new THREE.Mesh(rodGeometry, rodMaterial);
-            rod.position.set(0, 2.1, 0);
-            satellite.add(rod);
-            
-            // Secondary antennas (thin rods)
-            const thinRodGeometry = new THREE.CylinderGeometry(0.03, 0.03, 1.5, 8);
-            const thinRodMaterial = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                metalness: 0.95,
-                roughness: 0.1
-            });
-            
-            const antennaPositions = [
-                { x: 0.5, y: -1.5, rot: Math.PI / 6 },
-                { x: -0.5, y: -1.5, rot: -Math.PI / 6 },
-                { x: 0, y: -1.6, rot: 0 }
-            ];
-            
-            antennaPositions.forEach(pos => {
-                const antenna = new THREE.Mesh(thinRodGeometry, thinRodMaterial);
-                antenna.position.set(pos.x, pos.y, 0);
-                antenna.rotation.z = pos.rot;
-                satellite.add(antenna);
-            });
-            
-            // Communication modules with glowing lights
-            const moduleGeometry = new THREE.BoxGeometry(0.4, 0.4, 0.4);
-            const moduleMaterial = new THREE.MeshStandardMaterial({
-                color: 0x1e293b,
-                metalness: 0.9,
-                roughness: 0.3
-            });
-            
-            const glowMaterial = new THREE.MeshBasicMaterial({
-                color: 0x00ff00,
-                transparent: true,
-                opacity: 0.9
-            });
-            
-            const modulePositions = [
-                [0.7, 0.8, 0.7],
-                [-0.7, 0.8, 0.7],
-                [0.7, -0.8, 0.7],
-                [-0.7, -0.8, 0.7],
-                [0.7, 0.8, -0.7],
-                [-0.7, 0.8, -0.7],
-                [0.7, -0.8, -0.7],
-                [-0.7, -0.8, -0.7]
-            ];
-            
-            modulePositions.forEach(pos => {
-                const module = new THREE.Mesh(moduleGeometry, moduleMaterial);
-                module.position.set(...pos);
-                module.castShadow = true;
-                satellite.add(module);
-                
-                // Add glowing indicator light
-                const lightGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-                const light = new THREE.Mesh(lightGeometry, glowMaterial.clone());
-                light.position.set(pos[0], pos[1], pos[2] + 0.25);
-                satellite.add(light);
-            });
-            
-            // Glowing energy core in center
-            const coreGeometry = new THREE.SphereGeometry(0.25, 32, 32);
-            const coreMaterial = new THREE.MeshBasicMaterial({
-                color: 0x00ffff,
-                transparent: true,
-                opacity: 0.9
-            });
-            const core = new THREE.Mesh(coreGeometry, coreMaterial);
-            core.position.set(0, 0, 0);
-            satellite.add(core);
-            
-            // Outer glow rings around core
+            rocket.add(body);
+
+            const noseGeometry = new THREE.ConeGeometry(0.5, 1, 32);
+            const noseMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, shininess: 100 });
+            const nose = new THREE.Mesh(noseGeometry, noseMaterial);
+            nose.position.y = 2;
+            rocket.add(nose);
+
+            const finGeometry = new THREE.BoxGeometry(0.1, 1, 0.8);
+            const finMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+
             for (let i = 0; i < 3; i++) {
-                const glowRingGeometry = new THREE.TorusGeometry(0.3 + (i * 0.15), 0.02, 16, 32);
-                const glowRingMaterial = new THREE.MeshBasicMaterial({
-                    color: 0x00d4ff,
-                    transparent: true,
-                    opacity: 0.6 - (i * 0.15)
-                });
-                const glowRing = new THREE.Mesh(glowRingGeometry, glowRingMaterial);
-                glowRing.rotation.x = Math.PI / 2;
-                satellite.add(glowRing);
+                const fin = new THREE.Mesh(finGeometry, finMaterial);
+                const angle = (i * Math.PI * 2) / 3;
+                fin.position.x = Math.cos(angle) * 0.5;
+                fin.position.z = Math.sin(angle) * 0.5;
+                fin.position.y = -1.5;
+                fin.rotation.y = angle;
+                rocket.add(fin);
             }
-            
-            // Thruster nozzles at bottom
-            for (let i = 0; i < 4; i++) {
-                const angle = (i / 4) * Math.PI * 2;
-                const x = Math.cos(angle) * 0.6;
-                const z = Math.sin(angle) * 0.6;
-                
-                const thrusterGeometry = new THREE.CylinderGeometry(0.1, 0.15, 0.3, 16);
-                const thrusterMaterial = new THREE.MeshStandardMaterial({
-                    color: 0x4a4a4a,
-                    metalness: 0.9,
-                    roughness: 0.4
-                });
-                const thruster = new THREE.Mesh(thrusterGeometry, thrusterMaterial);
-                thruster.position.set(x, -1.4, z);
-                satellite.add(thruster);
-                
-                // Thruster glow
-                const thrusterGlowGeometry = new THREE.CylinderGeometry(0.08, 0.12, 0.2, 16);
-                const thrusterGlowMaterial = new THREE.MeshBasicMaterial({
-                    color: 0xff6600,
-                    transparent: true,
-                    opacity: 0.7
-                });
-                const thrusterGlow = new THREE.Mesh(thrusterGlowGeometry, thrusterGlowMaterial);
-                thrusterGlow.position.set(x, -1.6, z);
-                satellite.add(thrusterGlow);
-            }
-            
-            scene.add(satellite);
-            
-            // Add stars background
-            const starsGeometry = new THREE.BufferGeometry();
-            const starsMaterial = new THREE.PointsMaterial({
-                color: 0xffffff,
-                size: 0.1,
-                transparent: true,
-                opacity: 0.8
-            });
-            
-            const starsVertices = [];
-            for (let i = 0; i < 1000; i++) {
-                const x = (Math.random() - 0.5) * 100;
-                const y = (Math.random() - 0.5) * 100;
-                const z = (Math.random() - 0.5) * 100;
-                starsVertices.push(x, y, z);
-            }
-            
-            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
-            const stars = new THREE.Points(starsGeometry, starsMaterial);
-            scene.add(stars);
-            
-            // Mouse/Touch controls
-            let isDragging = false;
-            let previousMousePosition = { x: 0, y: 0 };
-            let autoRotate = true;
-            
-            canvas.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                autoRotate = false;
-                previousMousePosition = { x: e.clientX, y: e.clientY };
-            });
-            
-            canvas.addEventListener('mousemove', (e) => {
-                if (isDragging) {
-                    const deltaX = e.clientX - previousMousePosition.x;
-                    const deltaY = e.clientY - previousMousePosition.y;
-                    
-                    satellite.rotation.y += deltaX * 0.01;
-                    satellite.rotation.x += deltaY * 0.01;
-                    
-                    previousMousePosition = { x: e.clientX, y: e.clientY };
-                }
-            });
-            
-            canvas.addEventListener('mouseup', () => {
-                isDragging = false;
-                setTimeout(() => { autoRotate = true; }, 2000);
-            });
-            
-            canvas.addEventListener('mouseleave', () => {
-                isDragging = false;
-            });
-            
-            // Touch events for mobile
-            canvas.addEventListener('touchstart', (e) => {
-                isDragging = true;
-                autoRotate = false;
-                previousMousePosition = {
-                    x: e.touches[0].clientX,
-                    y: e.touches[0].clientY
-                };
-            });
-            
-            canvas.addEventListener('touchmove', (e) => {
-                if (isDragging && e.touches.length === 1) {
-                    const deltaX = e.touches[0].clientX - previousMousePosition.x;
-                    const deltaY = e.touches[0].clientY - previousMousePosition.y;
-                    
-                    satellite.rotation.y += deltaX * 0.01;
-                    satellite.rotation.x += deltaY * 0.01;
-                    
-                    previousMousePosition = {
-                        x: e.touches[0].clientX,
-                        y: e.touches[0].clientY
-                    };
-                }
-            });
-            
-            canvas.addEventListener('touchend', () => {
-                isDragging = false;
-                setTimeout(() => { autoRotate = true; }, 2000);
-            });
-            
-            // Zoom with mouse wheel
-            canvas.addEventListener('wheel', (e) => {
-                e.preventDefault();
-                camera.position.z += e.deltaY * 0.01;
-                camera.position.z = Math.max(5, Math.min(15, camera.position.z));
-            });
-            
-            // Window resize
-            window.addEventListener('resize', () => {
-                const width = canvas.parentElement.clientWidth;
-                const height = canvas.parentElement.clientHeight;
-                
-                camera.aspect = width / height;
-                camera.updateProjectionMatrix();
-                
-                renderer.setSize(width, height);
-            });
-            
-            // Animation loop
+
+            scene.add(rocket);
+            camera.position.z = 5;
+
             function animate() {
                 requestAnimationFrame(animate);
-                
-                const time = Date.now() * 0.001;
-                
-                // Auto-rotate satellite
-                if (autoRotate) {
-                    satellite.rotation.y += 0.005;
-                }
-                
-                // Animate solar panels - subtle tilt
-                leftPanel.rotation.y = Math.sin(time * 0.5) * 0.05;
-                rightPanel.rotation.y = Math.sin(time * 0.5) * 0.05;
-                
-                // Animate lights
-                blueLight.position.x = Math.sin(time) * 5;
-                blueLight.position.y = 3 + Math.cos(time * 0.5) * 2;
-                purpleLight.position.x = Math.cos(time) * 5;
-                purpleLight.position.y = 3 + Math.sin(time * 0.5) * 2;
-                
-                // Pulse the core
-                core.scale.setScalar(1 + Math.sin(time * 2) * 0.15);
-                core.material.opacity = 0.8 + Math.sin(time * 3) * 0.2;
-                
-                // Pulse the inner dish
-                innerDish.material.emissiveIntensity = 0.8 + Math.sin(time * 2) * 0.3;
-                
-                // Animate module lights
-                satellite.children.forEach(child => {
-                    if (child.geometry && child.geometry.type === 'SphereGeometry' && child.material.color.g === 1) {
-                        child.material.opacity = 0.7 + Math.sin(time * 4 + child.position.x) * 0.3;
-                    }
-                });
-                
-                // Animate thruster glows
-                satellite.children.forEach(child => {
-                    if (child.material && child.material.color.r === 1 && child.material.color.g === 0.4) {
-                        child.scale.y = 1 + Math.sin(time * 6 + child.position.x) * 0.3;
-                        child.material.opacity = 0.5 + Math.sin(time * 8 + child.position.x) * 0.3;
-                    }
-                });
-                
-                // Rotate stars slowly
-                stars.rotation.y += 0.0002;
-                stars.rotation.x += 0.0001;
-                
-                // Subtle camera movement for dynamism
-                if (autoRotate) {
-                    camera.position.y = 3 + Math.sin(time * 0.3) * 0.5;
-                }
-                
+                rocket.rotation.y += 0.01;
+                rocket.rotation.x = Math.sin(Date.now() * 0.001) * 0.2;
                 renderer.render(scene, camera);
             }
-            
-            // Hide loading and start animation
-            loading.style.display = 'none';
-            canvas.style.display = 'block';
             animate();
         }
+
+        // 3D Satellite Model
+        function createSatellite() {
+            const canvas = document.getElementById('satelliteModel');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(300, 300);
+
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+
+            const satellite = new THREE.Group();
+
+            const bodyGeometry = new THREE.BoxGeometry(1.5, 1, 1);
+            const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 100 });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            satellite.add(body);
+
+            const panelGeometry = new THREE.BoxGeometry(3, 0.1, 1.5);
+            const panelMaterial = new THREE.MeshPhongMaterial({ color: 0x0044aa, shininess: 100 });
+
+            const panel1 = new THREE.Mesh(panelGeometry, panelMaterial);
+            panel1.position.x = -2;
+            satellite.add(panel1);
+
+            const panel2 = new THREE.Mesh(panelGeometry, panelMaterial);
+            panel2.position.x = 2;
+            satellite.add(panel2);
+
+            const antennaGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 8);
+            const antennaMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc });
+            const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
+            antenna.position.y = 1.25;
+            satellite.add(antenna);
+
+            scene.add(satellite);
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+                satellite.rotation.y += 0.01;
+                satellite.rotation.x = Math.sin(Date.now() * 0.001) * 0.2;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        // Initialize 3D models when page loads
+        window.addEventListener('load', () => {
+            createRocket();
+            createSatellite();
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
     </script>
 </body>
+
 </html>
