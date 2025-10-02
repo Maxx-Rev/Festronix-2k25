@@ -53,7 +53,7 @@
             position: fixed;
             inset: 0;
             pointer-events: none;
-            z-index: 1;
+            z-index: 3;
         }
 
         /* Navigation */
@@ -63,7 +63,7 @@
             width: 100%;
             z-index: 1000;
             transition: all 0.3s;
-            padding: 1rem 0;
+            padding: 0.25rem 0;
             background: transparent;
         }
 
@@ -81,7 +81,6 @@
 
         .logo {
             height: 3rem;
-            animation: float 6s ease-in-out infinite;
         }
 
         .nav-links {
@@ -118,10 +117,28 @@
             flex-direction: column;
             gap: 1rem;
             padding: 1rem 0;
+            margin-top: 1rem;
+            background: rgba(30, 20, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            border: 1px solid var(--border);
         }
 
         .mobile-menu.active {
             display: flex;
+        }
+
+        .mobile-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--primary);
+            background: rgba(167, 139, 250, 0.1);
         }
 
         /* Animations */
@@ -205,6 +222,30 @@
             }
         }
 
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
         .animate-float {
             animation: float 6s ease-in-out infinite;
         }
@@ -215,6 +256,7 @@
 
         .animate-scale-in {
             animation: scaleIn 0.5s ease-out;
+            margin-top: -4rem;
         }
 
         .animate-pulse {
@@ -273,6 +315,8 @@
             padding-top: 8rem;
             background-image: url('hero-space-bg.jpg');
             background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
 
         #home h1 {
@@ -327,26 +371,34 @@
         }
 
         .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 1.5rem;
-            height: 2.5rem;
-            border: 2px solid var(--primary);
-            border-radius: 9999px;
+            padding-top: 3rem;
+            animation: fade-in-up 0.8s ease-out 0.6s backwards;
+        }
+
+        .scroll-text {
+            color: hsl(250, 40%, 10%);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+        }
+
+        .scroll-arrow {
+            width: 2rem;
+            height: 3.5rem;
+            border: 2px solid hsl(240, 10%, 60%);
+            border-radius: 1rem;
+            margin: 0 auto;
             display: flex;
             justify-content: center;
-            padding: 0.5rem;
-            animation: float 2s ease-in-out infinite;
         }
 
         .scroll-dot {
             width: 0.25rem;
             height: 0.75rem;
-            background: var(--primary);
-            border-radius: 9999px;
-            animation: pulse 2s ease-in-out infinite;
+            background: hsl(250, 30%, 20%);
+            border-radius: 0.25rem;
+            margin-top: 0.75rem;
+            animation: bounce 2s infinite;
         }
 
         /* Stats Grid */
@@ -403,6 +455,13 @@
         }
 
         /* Events Grid */
+        #events {
+            background-image: url(gallery-4.jpg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
         .events-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -511,130 +570,337 @@
         }
 
         /* Gallery */
-        .gallery-track {
-            overflow: hidden;
-            margin-bottom: 2rem;
+        .gallery-section {
+            position: relative;
+            padding: 5rem 1rem;
+            z-index: 1;
         }
 
-        .gallery-content {
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .gallery-header h2 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #b794f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .gallery-header p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        /* Gallery Track */
+        .gallery-track-wrapper {
+            overflow: hidden;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .gallery-track-wrapper:active {
+            cursor: grabbing;
+        }
+
+        .gallery-track {
             display: flex;
             gap: 1.5rem;
-            animation: scrollLeft 30s linear infinite;
-        }
-
-        .gallery-content.reverse {
-            animation: scrollRight 30s linear infinite;
+            will-change: transform;
+            transition: transform 0.1s linear;
         }
 
         .gallery-item {
             flex-shrink: 0;
-            width: 20rem;
-            height: 13rem;
+            width: 300px;
+            height: 200px;
             border-radius: 1rem;
             overflow: hidden;
-            transition: transform 0.3s;
+            position: relative;
+            box-shadow: 0 0 30px rgba(183, 148, 246, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .gallery-item:hover {
             transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(183, 148, 246, 0.6);
         }
 
         .gallery-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        @media (min-width: 768px) {
+            .gallery-item {
+                width: 400px;
+                height: 250px;
+            }
         }
 
         /* Coordinators */
-        .coordinators-grid {
+        #coordinators {
+            background-image: url(gallery-5.jpg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .coordinators-section {
+            position: relative;
+            padding: 5rem 2rem;
+            z-index: 2;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            max-width: 1400px;
+            margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            gap: 2.5rem;
+            padding: 0 1rem;
         }
 
-        .coordinator-card {
-            height: 24rem;
+        /* Card Container */
+        .card-container {
             perspective: 1000px;
+            height: 400px;
             cursor: pointer;
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
         }
 
-        .card-inner {
+        .card-container:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .card-container:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .card-container:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .card-container:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .card-container:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .card-container:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .card-container:nth-child(7) {
+            animation-delay: 0.7s;
+        }
+
+        .card-container:nth-child(8) {
+            animation-delay: 0.8s;
+        }
+
+        .card-container:nth-child(9) {
+            animation-delay: 0.9s;
+        }
+
+        .card {
             position: relative;
             width: 100%;
             height: 100%;
-            transition: transform 0.7s;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             transform-style: preserve-3d;
         }
 
-        .coordinator-card:hover .card-inner {
+        .card-container:hover .card {
+            transform: translateY(-10px);
+        }
+
+        .card-container.flipped .card {
             transform: rotateY(180deg);
         }
 
-        .card-front,
-        .card-back {
+        .card-face {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
             border-radius: 1rem;
             overflow: hidden;
+            border: 2px solid var(--border-color);
+            background: var(--bg-card);
+            transition: all 0.3s ease;
         }
 
+        .card-face:hover {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 30px var(--glow-purple);
+        }
+
+        /* Front Face */
         .card-front {
-            background: rgba(15, 15, 30, 0.5);
-            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
         }
 
+        .card-image {
+            height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card-container:hover .card-image img {
+            transform: scale(1.15);
+        }
+
+        .card-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to top, var(--bg-card), transparent);
+            pointer-events: none;
+        }
+
+        .card-info {
+            flex: 1;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--bg-card), #0f1528);
+        }
+
+        .card-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-info .position {
+            color: var(--primary-purple);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .card-info .hint {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Back Face */
         .card-back {
-            background: rgba(15, 15, 30, 0.9);
-            backdrop-filter: blur(10px);
             transform: rotateY(180deg);
             padding: 2rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            background: linear-gradient(135deg, #12182e, #1a1f3a, rgba(168, 85, 247, 0.1));
         }
 
-        .coordinator-image {
-            width: 100%;
-            height: 16rem;
-            object-fit: cover;
+        .card-back-header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
         }
 
-        .coordinator-info {
-            padding: 1.5rem;
+        .card-back-header h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
         }
 
-        .coordinator-name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
+        .card-back-header .position {
+            color: var(--accent-pink);
+            font-size: 0.95rem;
+            font-weight: 600;
         }
 
-        .coordinator-role {
-            color: var(--muted-foreground);
-            margin-bottom: 0.5rem;
+        .card-back-content {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
         }
 
-        .contact-info {
+        .card-back-content p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .card-back-contact {
+            border-top: 2px solid var(--border-color);
+            padding-top: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.5rem;
         }
 
         .contact-item {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            font-size: 0.875rem;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
         }
 
-        .contact-icon {
-            width: 1.25rem;
-            height: 1.25rem;
-            color: var(--accent);
+        .contact-item:hover {
+            color: var(--primary-purple);
+        }
+
+        .card-back-hint {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            margin-top: 0.5rem;
         }
 
         /* Contact */
@@ -797,17 +1063,6 @@
     <!-- Hero Section -->
     <section id="home">
         <div class="container animate-scale-in">
-            <svg width="600" height="150" viewBox="0 0 600 150" style="max-width: 100%;">
-                <defs>
-                    <linearGradient id="title-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" style="stop-color:hsl(280, 80%, 60%);stop-opacity:1" />
-                        <stop offset="50%" style="stop-color:hsl(220, 80%, 60%);stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:hsl(180, 80%, 50%);stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Orbitron"
-                    font-size="48" font-weight="bold" fill="url(#title-gradient)" class="glow-text">FESTRONIX</text>
-            </svg>
             <h1 class="glow-text">FESTRONIX</h1>
             <p class="hero-description">
                 Embark on an extraordinary journey through the cosmos of innovation, creativity, and competition.
@@ -817,9 +1072,12 @@
                 <a href="#events" class="btn btn-primary glow-border">Explore Events</a>
                 <a href="#about" class="btn btn-secondary">Learn More</a>
             </div>
-        </div>
-        <div class="scroll-indicator">
-            <div class="scroll-dot"></div>
+            <div class="scroll-indicator">
+                <p class="scroll-text">SCROLL TO DISCOVER</p>
+                <div class="scroll-arrow">
+                    <div class="scroll-dot"></div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -1086,79 +1344,23 @@
             </p>
         </div>
 
-        <div class="gallery-track">
-            <div class="gallery-content">
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#a855f7,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Galaxy 1</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#06b6d4,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Nebula 2</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#ec4899,#a855f7);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Cosmos 3</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#a855f7,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Galaxy 1</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#06b6d4,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Nebula 2</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#ec4899,#a855f7);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Cosmos 3</div>
-                </div>
+        <!-- First Track - Scrolling Left -->
+        <div class="gallery-track-wrapper" data-direction="left" data-speed="0.5">
+            <div class="gallery-track">
+                <!-- Images will be dynamically added -->
             </div>
         </div>
 
-        <div class="gallery-track">
-            <div class="gallery-content reverse">
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Space 4</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#f59e0b,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Aurora 5</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Stars 6</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Space 4</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#f59e0b,#ec4899);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Aurora 5</div>
-                </div>
-                <div class="gallery-item glow-border">
-                    <div
-                        style="width:100%;height:100%;background:linear-gradient(135deg,#8b5cf6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">
-                        Stars 6</div>
-                </div>
+        <!-- Second Track - Scrolling Right -->
+        <div class="gallery-track-wrapper" data-direction="right" data-speed="0.6">
+            <div class="gallery-track">
+                <!-- Images will be dynamically added -->
             </div>
         </div>
     </section>
 
     <!-- Coordinators Section -->
-    <section id="coordinators">
+    <section class="coordinators-section" id="coordinators">
         <div class="container">
             <h2 class="section-title glow-text">Mission Crew</h2>
             <div class="section-divider"></div>
@@ -1166,212 +1368,8 @@
                 Meet the stellar team behind Festronix's cosmic success
             </p>
 
-            <div class="coordinators-grid">
-                <!-- Coordinator 1 -->
-                <div class="coordinator-card">
-                    <div class="card-inner">
-                        <div class="card-front glow-border">
-                            <div
-                                style="width:100%;height:20rem;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:3rem;">
-                                <img src="coordinator-2.jpg" alt="Rahul Verma"
-                                    style="width:100%;height:20rem;object-fit:cover;">
-                            </div>
-                            <div class="coordinator-info">
-                                <h3 class="coordinator-name">Alex Chen</h3>
-                                <p class="coordinator-role">Chief Coordinator</p>
-                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
-                            </div>
-                        </div>
-                        <div class="card-back glow-border">
-                            <h3 class="coordinator-name">Alex Chen</h3>
-                            <div class="contact-info">
-                                <div class="contact-item">
-                                    <span>✉️</span>
-                                    <span>alex.chen@festronix.edu</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>📞</span>
-                                    <span>+91 98765 43210</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>💼</span>
-                                    <span>linkedin.com/in/alexchen</span>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Coordinator 2 -->
-                <div class="coordinator-card">
-                    <div class="card-inner">
-                        <div class="card-front glow-border">
-                            <div
-                                style="width:100%;height:16rem;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;align-items:center;justify-content:center;font-size:3rem;">
-                            </div>
-                            <div class="coordinator-info">
-                                <h3 class="coordinator-name">Priya Sharma</h3>
-                                <p class="coordinator-role">Technical Lead</p>
-                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
-                            </div>
-                        </div>
-                        <div class="card-back glow-border">
-                            <h3 class="coordinator-name">Priya Sharma</h3>
-                            <div class="contact-info">
-                                <div class="contact-item">
-                                    <span>✉️</span>
-                                    <span>priya.sharma@festronix.edu</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>📞</span>
-                                    <span>+91 98765 43211</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>💼</span>
-                                    <span>linkedin.com/in/priyasharma</span>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Coordinator 3 -->
-                <div class="coordinator-card">
-                    <div class="card-inner">
-                        <div class="card-front glow-border">
-                            <div
-                                style="width:100%;height:16rem;background:linear-gradient(135deg,#4facfe,#00f2fe);display:flex;align-items:center;justify-content:center;font-size:3rem;">
-                                👨‍🎤</div>
-                            <div class="coordinator-info">
-                                <h3 class="coordinator-name">Rahul Verma</h3>
-                                <p class="coordinator-role">Events Manager</p>
-                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
-                            </div>
-                        </div>
-                        <div class="card-back glow-border">
-                            <h3 class="coordinator-name">Rahul Verma</h3>
-                            <div class="contact-info">
-                                <div class="contact-item">
-                                    <span>✉️</span>
-                                    <span>rahul.verma@festronix.edu</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>📞</span>
-                                    <span>+91 98765 43212</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>💼</span>
-                                    <span>linkedin.com/in/rahulverma</span>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Coordinator 4 -->
-                <div class="coordinator-card">
-                    <div class="card-inner">
-                        <div class="card-front glow-border">
-                            <div
-                                style="width:100%;height:16rem;background:linear-gradient(135deg,#fa709a,#fee140);display:flex;align-items:center;justify-content:center;font-size:3rem;">
-                                👩‍🎨</div>
-                            <div class="coordinator-info">
-                                <h3 class="coordinator-name">Sarah Johnson</h3>
-                                <p class="coordinator-role">Marketing Head</p>
-                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
-                            </div>
-                        </div>
-                        <div class="card-back glow-border">
-                            <h3 class="coordinator-name">Sarah Johnson</h3>
-                            <div class="contact-info">
-                                <div class="contact-item">
-                                    <span>✉️</span>
-                                    <span>sarah.j@festronix.edu</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>📞</span>
-                                    <span>+91 98765 43213</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>💼</span>
-                                    <span>linkedin.com/in/sarahjohnson</span>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Coordinator 5 -->
-                <div class="coordinator-card">
-                    <div class="card-inner">
-                        <div class="card-front glow-border">
-                            <div
-                                style="width:100%;height:16rem;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;font-size:3rem;">
-                                👨‍💼</div>
-                            <div class="coordinator-info">
-                                <h3 class="coordinator-name">Arjun Patel</h3>
-                                <p class="coordinator-role">Sponsorship Lead</p>
-                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
-                            </div>
-                        </div>
-                        <div class="card-back glow-border">
-                            <h3 class="coordinator-name">Arjun Patel</h3>
-                            <div class="contact-info">
-                                <div class="contact-item">
-                                    <span>✉️</span>
-                                    <span>arjun.p@festronix.edu</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>📞</span>
-                                    <span>+91 98765 43214</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>💼</span>
-                                    <span>linkedin.com/in/arjunpatel</span>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Coordinator 6 -->
-                <div class="coordinator-card">
-                    <div class="card-inner">
-                        <div class="card-front glow-border">
-                            <div
-                                style="width:100%;height:16rem;background:linear-gradient(135deg,#a8edea,#fed6e3);display:flex;align-items:center;justify-content:center;font-size:3rem;">
-                                👩‍🎬</div>
-                            <div class="coordinator-info">
-                                <h3 class="coordinator-name">Maya Rodriguez</h3>
-                                <p class="coordinator-role">Creative Director</p>
-                                <p style="color: var(--accent); font-size: 0.875rem;">Hover to reveal contact</p>
-                            </div>
-                        </div>
-                        <div class="card-back glow-border">
-                            <h3 class="coordinator-name">Maya Rodriguez</h3>
-                            <div class="contact-info">
-                                <div class="contact-item">
-                                    <span>✉️</span>
-                                    <span>maya.r@festronix.edu</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>📞</span>
-                                    <span>+91 98765 43215</span>
-                                </div>
-                                <div class="contact-item">
-                                    <span>💼</span>
-                                    <span>linkedin.com/in/mayarodriguez</span>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" style="width: 100%;">Connect</button>
-                        </div>
-                    </div>
-                </div>
+            <div class="cards-grid" id="cardsGrid">
+                <!-- Cards will be generated by JavaScript -->
             </div>
         </div>
     </section>
@@ -1447,82 +1445,240 @@
 
     <!-- JavaScript -->
     <script>
-        // Star Field Animation
-        const canvas = document.getElementById('starfield');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        // --- Global Declarations & Event Listeners ---
 
-        const stars = [];
-        for (let i = 0; i < 200; i++) {
-            stars.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 2,
-                speed: Math.random() * 0.5 + 0.1,
-                opacity: Math.random()
-            });
-        }
-
-        function animateStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            stars.forEach(star => {
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-                ctx.fill();
-
-                // Twinkling effect
-                star.opacity += (Math.random() - 0.5) * 0.02;
-                star.opacity = Math.max(0.1, Math.min(1, star.opacity));
-
-                // Movement
-                star.y += star.speed;
-                if (star.y > canvas.height) {
-                    star.y = 0;
-                    star.x = Math.random() * canvas.width;
-                }
-            });
-
-            requestAnimationFrame(animateStars);
-        }
-        animateStars();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        // Navigation Scroll Effect
+        // Navigation elements (from first block)
         const nav = document.getElementById('nav');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                nav.classList.add('scrolled');
-            } else {
-                nav.classList.remove('scrolled');
-            }
-        });
-
-        // Mobile Menu Toggle
         const menuToggle = document.getElementById('menuToggle');
         const mobileMenu = document.getElementById('mobileMenu');
-        menuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            menuToggle.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+
+        // Star Field Canvas elements (from first block)
+        const canvas = document.getElementById('starfield');
+        // Check if canvas exists before getting context (good practice)
+        const ctx = canvas ? canvas.getContext('2d') : null;
+
+        // Coordinators Data (from second block)
+        const coordinators = [
+            {
+                name: "Dr. Sarah Mitchell",
+                position: "Event Director",
+                description: "Leading space exploration initiatives with over 15 years of experience in coordinating international aerospace events. Passionate about bringing together the brightest minds in the cosmos.",
+                email: "s.mitchell@space.org",
+                phone: "+1 (555) 0101",
+                image: "coordinator-2.jpg"
+            },
+            {
+                name: "Commander Alex Chen",
+                position: "Technical Lead",
+                description: "Expert in mission planning and space technology integration. Formerly with NASA, now dedicated to educational outreach and inspiring the next generation of astronauts.",
+                email: "a.chen@space.org",
+                phone: "+1 (555) 0102",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23556' width='400' height='400'/%3E%3Ctext fill='%23fff' font-family='sans-serif' font-size='60' text-anchor='middle' x='200' y='220'%3ECmd. Alex%3C/text%3E%3C/svg%3E"
+            },
+            {
+                name: "Prof. Maria Rodriguez",
+                position: "Research Coordinator",
+                description: "Astrophysicist specializing in cosmic phenomena and deep space exploration. Coordinates research teams from around the globe on cutting-edge space missions.",
+                email: "m.rodriguez@space.org",
+                phone: "+1 (555) 0103",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23778' width='400' height='400'/%3E%3Ctext fill='%23fff' font-family='sans-serif' font-size='60' text-anchor='middle' x='200' y='220'%3EProf. Maria%3C/text%3E%3C/svg%3E"
+            },
+            {
+                name: "Dr. James Wilson",
+                position: "Operations Manager",
+                description: "Ensures seamless execution of all event operations. Background in aerospace engineering and project management for international space agencies.",
+                email: "j.wilson@space.org",
+                phone: "+1 (555) 0104",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23889' width='400' height='400'/%3E%3Ctext fill='%23fff' font-family='sans-serif' font-size='60' text-anchor='middle' x='200' y='220'%3EDr. James%3C/text%3E%3C/svg%3E"
+            },
+            {
+                name: "Captain Elena Volkov",
+                position: "Safety Officer",
+                description: "Veteran mission specialist with extensive experience in space safety protocols. Committed to maintaining the highest standards of safety for all participants.",
+                email: "e.volkov@space.org",
+                phone: "+1 (555) 0105",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23665' width='400' height='400'/%3E%3Ctext fill='%23fff' font-family='sans-serif' font-size='60' text-anchor='middle' x='200' y='220'%3ECpt. Elena%3C/text%3E%3C/svg%3E"
+            },
+            {
+                name: "Dr. Kenji Tanaka",
+                position: "Science Advisor",
+                description: "Leading researcher in astrobiology and planetary science. Provides scientific guidance and oversees research symposiums during the event.",
+                email: "k.tanaka@space.org",
+                phone: "+1 (555) 0106",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23887' width='400' height='400'/%3E%3Ctext fill='%23fff' font-family='sans-serif' font-size='60' text-anchor='middle' x='200' y='220'%3EDr. Kenji%3C/text%3E%3C/svg%3E"
+            },
+            {
+                name: "Lt. Col. Rebecca Stone",
+                position: "Logistics Chief",
+                description: "Military logistics expert now applying precision planning to space event coordination. Ensures every detail is perfectly executed.",
+                email: "r.stone@space.org",
+                phone: "+1 (555) 0107",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23776' width='400' height='400'/%3E%3Ctext fill='%23fff' font-family='sans-serif' font-size='55' text-anchor='middle' x='200' y='220'%3ELt. Rebecca%3C/text%3E%3C/svg%3E"
+            },
+            {
+                name: "Dr. Ahmed Hassan",
+                position: "Communications Head",
+                description: "Master of global communications and media relations. Connects our space community with the world through inspiring storytelling and outreach.",
+                email: "a.hassan@space.org",
+                phone: "+1 (555) 0108",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23668' width='400' height='400'/%3E%3Ctext fill='%23fff' font-family='sans-serif' font-size='60' text-anchor='middle' x='200' y='220'%3EDr. Ahmed%3C/text%3E%3C/svg%3E"
+            },
+            {
+                name: "Dr. Lisa Park",
+                position: "Education Director",
+                description: "Dedicated to making space accessible to everyone. Develops educational programs and workshops that ignite curiosity about the cosmos.",
+                email: "l.park@space.org",
+                phone: "+1 (555) 0109",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23799' width='400' height='400'/%3E%3Ctext fill='%23fff' font-family='sans-serif' font-size='60' text-anchor='middle' x='200' y='220'%3EDr. Lisa%3C/text%3E%3C/svg%3E"
+            }
+        ];
+
+        // Gallery Images Data (from first block)
+        const spaceImages = {
+            track1: [
+                'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80',
+                'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80',
+                'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80',
+                'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800&q=80'
+            ],
+            track2: [
+                'https://images.unsplash.com/photo-1464802686167-b939a6910659?w=800&q=80',
+                'https://images.unsplash.com/photo-1545156521-77bd85671d30?w=800&q=80',
+                'https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=800&q=80',
+                'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=800&q=80'
+            ]
+        };
+
+        // Array for Star Field Animation
+        let stars = [];
+
+
+        // --- Star Field Animation Functions (from both blocks) ---
+
+        /**
+         * Initializes and starts the Star Field animation.
+         */
+        function initStarField() {
+            if (!canvas || !ctx) return; // Exit if canvas is not available
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Initial star generation
+            stars = []; // Clear any stars from the first block's init
+            const starCount = 200;
+
+            for (let i = 0; i < starCount; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5, // Using 'radius' for consistency, previously 'size'
+                    opacity: Math.random(),
+                    speed: Math.random() * 0.5 + 0.1,
+                    twinkleSpeed: Math.random() * 0.02 + 0.01 // Added from second block
+                });
+            }
+
+            function animateStars() { // Renamed from 'animate' in second block to avoid conflict/confusion
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.shadowBlur = 0; // Reset blur for non-glowing stars
+
+                stars.forEach(star => {
+                    // Twinkle effect
+                    star.opacity += star.twinkleSpeed * (Math.random() > 0.5 ? 1 : -1);
+                    star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+
+                    // Movement (from first block)
+                    star.y += star.speed;
+                    if (star.y > canvas.height) {
+                        star.y = 0;
+                        star.x = Math.random() * canvas.width;
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                    ctx.fill();
+
+                    // Add glow to some stars (from second block)
+                    if (star.radius > 1) {
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = `rgba(168, 85, 247, ${star.opacity * 0.5})`;
+                    }
+                });
+
+                requestAnimationFrame(animateStars);
+            }
+            animateStars();
+        }
+
+        // --- Navigation and Scrolling Effects ---
+
+        // Navigation Scroll Effect (from first block)
+        window.addEventListener('scroll', () => {
+            if (nav) {
+                if (window.scrollY > 50) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            }
+            handleParallax(); // Call parallax on scroll
         });
 
-        // Close mobile menu on link click
-        document.querySelectorAll('.mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                menuToggle.textContent = '☰';
+        // Mobile Menu Toggle (from first block)
+        if (menuToggle && mobileMenu) {
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                menuToggle.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+            });
+
+            // Close mobile menu on link click
+            document.querySelectorAll('.mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    menuToggle.textContent = '☰';
+                });
+            });
+        }
+
+        // Smooth scroll for anchor links (from first block)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
         });
 
-        // 3D Rocket Model
+        // Parallax Effect (from second block)
+        function handleParallax() {
+            const scrolled = window.pageYOffset;
+            const hero = document.getElementById('hero');
+            if (hero) {
+                const heroContent = hero.querySelector('.hero-content');
+                heroContent.style.transform = `translateY(${scrolled * 0.5}px)`;
+                heroContent.style.opacity = 1 - (scrolled / 700);
+            }
+        }
+
+
+        // --- 3D Model Functions (Requires THREE.js, from first block) ---
+
+        /**
+         * Creates and animates the 3D Rocket Model.
+         * Assumes THREE.js library is loaded.
+         */
         function createRocket() {
             const canvas = document.getElementById('rocketModel');
+            if (!canvas || typeof THREE === 'undefined') return; // Check for canvas and THREE.js
+
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -1541,17 +1697,20 @@
 
             const rocket = new THREE.Group();
 
+            // Body
             const bodyGeometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 32);
             const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc, shininess: 100 });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
             rocket.add(body);
 
+            // Nose
             const noseGeometry = new THREE.ConeGeometry(0.5, 1, 32);
             const noseMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000, shininess: 100 });
             const nose = new THREE.Mesh(noseGeometry, noseMaterial);
             nose.position.y = 2;
             rocket.add(nose);
 
+            // Fins
             const finGeometry = new THREE.BoxGeometry(0.1, 1, 0.8);
             const finMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
 
@@ -1577,9 +1736,14 @@
             animate();
         }
 
-        // 3D Satellite Model
+        /**
+         * Creates and animates the 3D Satellite Model.
+         * Assumes THREE.js library is loaded.
+         */
         function createSatellite() {
             const canvas = document.getElementById('satelliteModel');
+            if (!canvas || typeof THREE === 'undefined') return; // Check for canvas and THREE.js
+
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
             const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -1594,11 +1758,13 @@
 
             const satellite = new THREE.Group();
 
+            // Body
             const bodyGeometry = new THREE.BoxGeometry(1.5, 1, 1);
             const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 100 });
             const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
             satellite.add(body);
 
+            // Solar Panels
             const panelGeometry = new THREE.BoxGeometry(3, 0.1, 1.5);
             const panelMaterial = new THREE.MeshPhongMaterial({ color: 0x0044aa, shininess: 100 });
 
@@ -1610,6 +1776,7 @@
             panel2.position.x = 2;
             satellite.add(panel2);
 
+            // Antenna
             const antennaGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 8);
             const antennaMaterial = new THREE.MeshPhongMaterial({ color: 0xcccccc });
             const antenna = new THREE.Mesh(antennaGeometry, antennaMaterial);
@@ -1628,22 +1795,270 @@
             animate();
         }
 
-        // Initialize 3D models when page loads
+
+        // --- Gallery and Coordinator Functions (from both blocks) ---
+
+        // Infinite Gallery Class (from first block)
+        class InfiniteGallery {
+            constructor(wrapper) {
+                this.wrapper = wrapper;
+                this.track = wrapper.querySelector('.gallery-track');
+                this.direction = wrapper.dataset.direction || 'left';
+                this.speed = parseFloat(wrapper.dataset.speed) || 0.5;
+                this.position = 0;
+                this.isDragging = false;
+                this.startX = 0;
+                this.currentX = 0;
+                this.dragOffset = 0;
+                this.isPaused = false;
+                // Calculation assumes images are tripled in initGallery
+                this.maxScroll = 0;
+
+                this.init();
+            }
+
+            init() {
+                // Must wait for images to load to calculate maxScroll correctly
+                // Simple way to wait:
+                setTimeout(() => {
+                    if (this.track.scrollWidth > 0) {
+                        this.maxScroll = this.track.scrollWidth / 3;
+                    } else {
+                        console.warn('Gallery track width is zero. Check CSS or image loading.');
+                    }
+                }, 500);
+
+                // Mouse events
+                this.wrapper.addEventListener('mousedown', (e) => this.startDrag(e));
+                document.addEventListener('mousemove', (e) => this.drag(e));
+                document.addEventListener('mouseup', () => this.endDrag());
+
+                // Touch events
+                this.wrapper.addEventListener('touchstart', (e) => this.startDrag(e), { passive: false });
+                document.addEventListener('touchmove', (e) => this.drag(e), { passive: false });
+                document.addEventListener('touchend', () => this.endDrag());
+
+                // Prevent context menu
+                this.wrapper.addEventListener('contextmenu', (e) => e.preventDefault());
+
+                // Start animation
+                this.animate();
+            }
+
+            startDrag(e) {
+                this.isDragging = true;
+                this.isPaused = true;
+                this.startX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                this.currentX = this.startX;
+                this.dragOffset = 0;
+                this.wrapper.style.cursor = 'grabbing';
+            }
+
+            drag(e) {
+                if (!this.isDragging) return;
+
+                e.preventDefault();
+                const x = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+                this.dragOffset = (x - this.startX) * 1.5;
+                this.currentX = x;
+            }
+
+            endDrag() {
+                if (!this.isDragging) return;
+
+                this.isDragging = false;
+                this.position += this.dragOffset;
+                this.dragOffset = 0;
+                this.wrapper.style.cursor = 'grab';
+
+                setTimeout(() => {
+                    this.isPaused = false;
+                }, 100);
+            }
+
+            animate() {
+                if (!this.isPaused && this.maxScroll > 0) {
+                    const speed = this.direction === 'left' ? this.speed : -this.speed;
+                    this.position -= speed;
+
+                    // Reset for infinite loop
+                    if (Math.abs(this.position) >= this.maxScroll) {
+                        this.position = 0;
+                    } else if (this.position > 0) {
+                        this.position = -this.maxScroll;
+                    }
+                }
+
+                const totalOffset = this.position + this.dragOffset;
+                this.track.style.transform = `translateX(${totalOffset}px)`;
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize gallery tracks (from first block)
+        function initGallery() {
+            const tracks = document.querySelectorAll('.gallery-track-wrapper');
+
+            tracks.forEach((wrapper, trackIndex) => {
+                const track = wrapper.querySelector('.gallery-track');
+                const images = trackIndex === 0 ? spaceImages.track1 : spaceImages.track2;
+
+                // Triple the images for seamless loop
+                const tripleImages = [...images, ...images, ...images];
+
+                tripleImages.forEach((src, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    item.innerHTML = `<img src="${src}" alt="Space ${index + 1}" loading="lazy">`;
+                    track.appendChild(item);
+                });
+
+                // Initialize infinite scroll
+                new InfiniteGallery(wrapper);
+            });
+        }
+
+        // Create Floating Particles (from second block)
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            if (!container) return;
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Generate Coordinator Cards (from second block)
+        function generateCards() {
+            const grid = document.getElementById('cardsGrid');
+            if (!grid) return;
+
+            coordinators.forEach((coordinator) => {
+                const cardContainer = document.createElement('div');
+                cardContainer.className = 'card-container';
+                cardContainer.onclick = function () {
+                    this.classList.toggle('flipped');
+                };
+
+                cardContainer.innerHTML = `
+            <div class="card">
+                <div class="card-face card-front">
+                    <div class="card-image">
+                        <img src="${coordinator.image}" alt="${coordinator.name}">
+                    </div>
+                    <div class="card-info">
+                        <h3>${coordinator.name}</h3>
+                        <p class="position">${coordinator.position}</p>
+                        <p class="hint">Tap to learn more</p>
+                    </div>
+                </div>
+                <div class="card-face card-back">
+                    <div class="card-back-header">
+                        <h3>${coordinator.name}</h3>
+                        <p class="position">${coordinator.position}</p>
+                    </div>
+                    <div class="card-back-content">
+                        <p>${coordinator.description}</p>
+                    </div>
+                    <div class="card-back-contact">
+                        <div class="contact-item">
+                            <span>📧</span>
+                            <span>${coordinator.email}</span>
+                        </div>
+                        <div class="contact-item">
+                            <span>📞</span>
+                            <span>${coordinator.phone}</span>
+                        </div>
+                    </div>
+                    <p class="card-back-hint">Tap to flip back</p>
+                </div>
+            </div>
+        `;
+
+                grid.appendChild(cardContainer);
+            });
+        }
+
+        // Mouse Follow Effect on Cards (from second block)
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.card-container');
+
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 20;
+                    const rotateY = (centerX - x) / 20;
+
+                    const cardEl = card.querySelector('.card');
+                    if (!card.classList.contains('flipped')) {
+                        cardEl.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+                    }
+                } else {
+                    const cardEl = card.querySelector('.card');
+                    if (!card.classList.contains('flipped')) {
+                        cardEl.style.transform = '';
+                    }
+                }
+            });
+        });
+
+        // Add keyboard navigation (from second block)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.card-container.flipped').forEach(card => {
+                    card.classList.remove('flipped');
+                });
+            }
+        });
+
+
+        // --- Initialization Callbacks ---
+
+        // Initialize all DOM-dependent functions once the DOM is ready
+        window.addEventListener('DOMContentLoaded', () => {
+            // Functions that depend on DOM structure/elements being available
+            createParticles();
+            generateCards();
+            initGallery();
+
+            // Hide loading screen (if element exists)
+            const loadingScreen = document.getElementById('loading');
+            if (loadingScreen) {
+                setTimeout(() => {
+                    loadingScreen.classList.add('hidden');
+                }, 1000);
+            }
+        });
+
+        // Initialize functions that rely on window/assets being loaded (like Canvas resize/content loading)
         window.addEventListener('load', () => {
+            // Star field initialization (was split, now merged into one function)
+            initStarField();
+
+            // Initialize 3D models (requires THREE.js to be loaded)
             createRocket();
             createSatellite();
         });
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
+        // Utility function (from second block, but not used in final combined code, kept for completeness)
+        // function scrollToCoordinators() {
+        //     document.getElementById('coordinators').scrollIntoView({ 
+        //         behavior: 'smooth' 
+        //     });
+        // }
     </script>
 </body>
 
